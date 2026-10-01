@@ -1,0 +1,1178 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>Z, t &amp; p-Values Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: single reading column on graph-paper ground; six numbered tabs follow the lecture order; tables live in a slide-out drawer reachable from any tab. Tokens match the Toothpick Challenge app. */
+  :root{
+    --paper:#F3F5F4; --panel:#FFFFFF; --ink:#1B2430; --muted:#5B6672; --line:#D8DEE0;
+    --navy:#1F4E79; --navy-dim:#33648f;
+    --tcol:#1F4E79; --tfill:#DCEBF6;
+    --zcol:#4F9E6E; --zfill:#E1F1E5;
+    --amber:#C9822E; --amber-fill:#F4E1C4;
+    --good:#3C8A5B; --good-fill:#E3F3E9;
+    --bad:#B24242; --bad-fill:#F7E4E4;
+    --concept:#FBF7EE;
+    --pv:#6B4FA0; --pv-fill:#ECE5F6;
+    --radius:14px;
+    --f-display:'Fraunces', Georgia, serif;
+    --f-body:'Inter', system-ui, -apple-system, sans-serif;
+    --f-mono:'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#161A1F; --panel:#1E242B; --ink:#E7EBEE; --muted:#9AA6B1; --line:#333C45;
+      --navy:#8FC0EA; --navy-dim:#6FA6D6;
+      --tcol:#8FC0EA; --tfill:#213241;
+      --zcol:#79C99A; --zfill:#1F3327;
+      --amber:#E0A050; --amber-fill:#3A2E1A;
+      --good:#7FCE9E; --good-fill:#1E3327;
+      --bad:#E08080; --bad-fill:#3A2323;
+      --concept:#26211a;
+      --pv:#B9A2E8; --pv-fill:#2C2540;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#161A1F; --panel:#1E242B; --ink:#E7EBEE; --muted:#9AA6B1; --line:#333C45;
+    --navy:#8FC0EA; --navy-dim:#6FA6D6;
+    --tcol:#8FC0EA; --tfill:#213241;
+    --zcol:#79C99A; --zfill:#1F3327;
+    --amber:#E0A050; --amber-fill:#3A2E1A;
+    --good:#7FCE9E; --good-fill:#1E3327;
+    --bad:#E08080; --bad-fill:#3A2323;
+    --concept:#26211a;
+    --pv:#B9A2E8; --pv-fill:#2C2540;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper);
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px; background-attachment: fixed;
+    color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--navy);}
+  .wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:36px 110px;}
+  header.hero{padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:24px;}
+  .eyebrow{font-family:var(--f-mono);font-size:13px;color:var(--muted);letter-spacing:.03em;margin:0 0 10px;}
+  h1{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,5.4vw,42px);line-height:1.08;margin:0 0 14px;color:var(--navy);text-wrap:balance;}
+  .hero p{max-width:62ch;color:var(--muted);font-size:16px;margin:0 0 10px;}
+  .howto{max-width:64ch;margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--tfill);border:1px solid color-mix(in srgb, var(--tcol) 35%, var(--line));}
+  .howto .tag{display:block;font-family:var(--f-mono);font-size:11.5px;color:var(--tcol);font-weight:600;letter-spacing:.04em;margin-bottom:5px;text-transform:uppercase;}
+  .howto p{margin:0;font-size:14.5px;color:var(--ink);}
+
+  .section-nav{display:flex;flex-direction:column;gap:10px;margin-bottom:34px;}
+  .nav-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;}
+  .nav-row .partlab{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);width:56px;letter-spacing:.04em;text-transform:uppercase;}
+  .section-nav a{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:5px 14px 5px 5px;font-size:13px;color:var(--ink);text-decoration:none;}
+  .section-nav a:hover,.section-nav a:focus-visible{border-color:var(--navy-dim);}
+
+  .part-divider{display:flex;align-items:baseline;gap:14px;margin:58px 0 22px;padding-top:18px;border-top:2px solid var(--navy);}
+  .part-divider .pn{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--navy);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+  .part-divider .pt{font-family:var(--f-display);font-size:clamp(22px,4vw,28px);font-weight:600;color:var(--ink);text-wrap:balance;}
+  .part-divider:first-of-type{margin-top:10px;}
+
+  h2{font-family:var(--f-display);font-weight:600;font-size:23px;color:var(--navy);margin:0 0 6px;display:flex;align-items:center;gap:12px;text-wrap:balance;}
+  .secnum{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;flex:none;background:var(--navy);color:var(--panel);font-family:var(--f-mono);font-size:16px;font-weight:600;}
+  .secnum.small{width:22px;height:22px;font-size:12px;}
+  h3{font-size:16px;margin:0 0 6px;}
+  .section{margin-bottom:46px;}
+  .lede{color:var(--muted);max-width:64ch;margin:0 0 18px;font-size:15px;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;min-width:0;}
+  .panel + .panel{margin-top:14px;}
+  .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;}
+
+  .explain-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px;}
+  @media(min-width:680px){.explain-grid{grid-template-columns:repeat(3,1fr);}}
+  .explain-grid.two{grid-template-columns:1fr;}
+  @media(min-width:680px){.explain-grid.two{grid-template-columns:1fr 1fr;}}
+  .explain-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;min-width:0;}
+  .explain-card .tag{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;}
+  .explain-card.z .tag{color:var(--zcol);} .explain-card.t .tag{color:var(--tcol);}
+  .explain-card p{margin:0;font-size:14.5px;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-end;margin-bottom:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:150px;flex:1 1 170px;}
+  .field label,.field .flabel{font-size:12.5px;color:var(--muted);font-weight:600;}
+  select,input[type=number],input[type=text]{font-family:var(--f-mono);font-size:15px;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--ink);}
+  input[type=range]{width:100%;accent-color:var(--navy);}
+  .slider-row{display:flex;align-items:center;gap:12px;}
+  .slider-row output{font-family:var(--f-mono);font-weight:600;color:var(--navy);min-width:44px;text-align:right;}
+  .check{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);}
+  .check input{accent-color:var(--navy);width:16px;height:16px;}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  svg{display:block;width:100%;height:auto;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted);margin-top:10px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:16px;height:10px;border-radius:2px;display:inline-block;flex:none;}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px;}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0;}
+  .stat .k{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px;}
+  .stat .v{display:block;font-family:var(--f-mono);font-size:19px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums;}
+  .stat.z .v{color:var(--zcol);} .stat.bad .v{color:var(--bad);} .stat.amber .v{color:var(--amber);} .stat.good .v{color:var(--good);}
+  .callout{margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--amber-fill);border:1px solid color-mix(in srgb, var(--amber) 40%, var(--line));font-size:15px;}
+  .callout .big{font-family:var(--f-mono);font-weight:600;color:var(--amber);}
+  .note{font-size:13.5px;color:var(--muted);margin-top:10px;}
+  .tryit{margin:14px 0 0;padding:12px 16px 12px 34px;background:var(--concept);border:1px solid var(--line);border-radius:10px;font-size:14px;}
+  .tryit li{margin:3px 0;}
+  .tryit-h{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.04em;text-transform:uppercase;margin:16px 0 0;}
+
+  .twocol{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media(min-width:720px){.twocol{grid-template-columns:1fr 1fr;}}
+  .hcard{border-radius:12px;padding:14px;border:1px solid var(--line);min-width:0;}
+  .hcard.z{background:var(--zfill);} .hcard.t{background:var(--tfill);}
+  .hcard h3{font-size:14.5px;}
+  .hcard.z h3{color:var(--zcol);} .hcard.t h3{color:var(--tcol);}
+
+  .btn{background:none;border:1px solid var(--navy-dim);color:var(--navy-dim);padding:6px 13px;border-radius:16px;font-size:13px;font-family:var(--f-body);font-weight:600;cursor:pointer;}
+  .btn:hover{background:var(--navy-dim);color:var(--panel);}
+  .btn.sel{background:var(--navy);color:var(--panel);border-color:var(--navy);}
+  .cta{background:var(--navy);color:var(--panel);border:none;border-radius:26px;padding:12px 22px;font-size:15px;font-weight:700;font-family:var(--f-body);cursor:pointer;box-shadow:0 4px 14px color-mix(in srgb, var(--navy) 40%, transparent);}
+  .cta:hover{background:var(--navy-dim);}
+  .cta.pulse{animation:ctaPulse 1.7s ease-in-out infinite;}
+  @keyframes ctaPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+  @media (prefers-reduced-motion: reduce){.cta.pulse{animation:none;}}
+
+  /* comparison table */
+  .tscroll{overflow-x:auto;}
+  table.cmp{width:100%;border-collapse:collapse;font-size:14px;}
+  table.cmp th,table.cmp td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  table.cmp thead th{font-weight:700;}
+  table.cmp th.z{color:var(--zcol);background:var(--zfill);} table.cmp th.t{color:var(--tcol);background:var(--tfill);}
+  table.cmp tbody th{font-weight:600;color:var(--muted);font-size:13px;}
+  table.cmp tr.key td,table.cmp tr.key th{background:var(--amber-fill);}
+
+  .flow{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin:14px 0 4px;}
+  .flow .box{flex:1 1 180px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--paper);font-size:14px;min-width:0;}
+  .flow .box b{display:block;margin-bottom:3px;}
+  .flow .box.z{background:var(--zfill);} .flow .box.t{background:var(--tfill);}
+  .flow .arrow{align-self:center;font-family:var(--f-mono);color:var(--muted);}
+
+  .sort-list{display:flex;flex-direction:column;gap:10px;}
+  .sort-card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel);}
+  .sort-card p{margin:0 0 8px;font-size:14.5px;}
+  .sort-card .btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .fb{font-size:13.5px;margin-top:8px;padding:8px 10px;border-radius:8px;}
+  .fb.ok{background:var(--good-fill);} .fb.no{background:var(--bad-fill);}
+  .score{font-family:var(--f-mono);font-weight:600;color:var(--navy);}
+
+  .verdict{display:inline-block;padding:4px 12px;border-radius:14px;font-weight:700;font-size:13.5px;}
+  .verdict.rej{background:var(--good-fill);color:var(--good);border:1px solid var(--good);}
+  .verdict.fail{background:var(--amber-fill);color:var(--amber);border:1px solid var(--amber);}
+  .sentence{font-size:15.5px;margin:14px 0 0;padding:14px 16px;border-left:4px solid var(--navy);background:var(--paper);border-radius:0 10px 10px 0;}
+
+  .not-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px;}
+  @media(min-width:680px){.not-grid{grid-template-columns:repeat(3,1fr);}}
+  .not-card{border:1px solid color-mix(in srgb, var(--bad) 40%, var(--line));background:var(--bad-fill);border-radius:10px;padding:12px;font-size:14px;}
+  .not-card b{display:block;color:var(--bad);margin-bottom:4px;}
+
+  /* error grid */
+  .egrid{display:grid;grid-template-columns:minmax(90px,.8fr) 1fr 1fr;gap:6px;font-size:14px;}
+  .egrid > div{border-radius:9px;padding:10px 12px;min-width:0;}
+  .egrid .hd{font-weight:700;color:var(--muted);font-size:12.5px;background:transparent;padding:4px 8px;align-self:end;}
+  .egrid .rh{font-weight:700;color:var(--muted);font-size:12.5px;background:var(--paper);border:1px solid var(--line);}
+  .egrid .okc{background:var(--good-fill);border:1px solid color-mix(in srgb,var(--good) 40%,var(--line));}
+  .egrid .e1{background:var(--bad-fill);border:2px solid var(--bad);}
+  .egrid .e2{background:var(--amber-fill);border:2px solid var(--amber);}
+  .egrid b{display:block;}
+  .egrid small{color:var(--muted);display:block;margin-top:2px;}
+
+  .dots{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;margin-top:12px;max-width:520px;}
+  .dot{aspect-ratio:1;border-radius:50%;background:var(--line);max-width:100%;}
+  .dot.fa{background:var(--bad);} .dot.miss{background:var(--amber);} .dot.hit{background:var(--good);} .dot.cn{background:color-mix(in srgb, var(--muted) 45%, var(--panel));}
+
+  /* scenarios */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:13.5px;color:var(--ink);cursor:pointer;font-family:var(--f-body);}
+  .tab .pill{font-family:var(--f-mono);font-size:11px;font-weight:600;padding:1px 6px;border-radius:8px;background:var(--paper);color:var(--muted);}
+  .tab[aria-selected="true"]{background:var(--navy);color:var(--panel);border-color:var(--navy);}
+  .tab .done{color:var(--good);font-weight:700;}
+  .story{padding:14px 16px;border-radius:10px;background:var(--tfill);border:1px solid color-mix(in srgb, var(--tcol) 30%, var(--line));font-size:15px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .chip{font-family:var(--f-mono);font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 9px;}
+  .step{border-top:1px solid var(--line);padding:16px 0 4px;}
+  .step:first-of-type{border-top:none;}
+  .step-h{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:8px;}
+  .step-n{font-family:var(--f-mono);font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--muted);}
+  .step.complete .step-n{background:var(--good-fill);color:var(--good);border-color:var(--good);}
+  .step p{margin:0 0 8px;font-size:14.5px;max-width:66ch;}
+  .formula{font-family:var(--f-mono);font-size:14px;background:var(--paper);border:1px dashed var(--line);border-radius:8px;padding:6px 10px;display:inline-block;margin:2px 0 8px;}
+  .answer-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap;}
+  .answer-row label{font-size:14px;min-width:0;}
+  .answer-row input{width:110px;}
+  .status{font-size:13px;font-weight:600;}
+  .status.ok{color:var(--good);} .status.bad{color:var(--bad);}
+  .hintline{font-size:13px;color:var(--muted);}
+  .linkbtn{background:none;border:none;color:var(--navy);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;font-family:var(--f-body);}
+  .example-banner{margin-bottom:12px;padding:10px 14px;border-radius:9px;font-size:13.5px;background:var(--amber-fill);border:1px solid color-mix(in srgb, var(--amber) 40%, var(--line));}
+  .mode-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 6px;}
+
+  /* lookup tables */
+  .tbl-tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  table.lk{border-collapse:collapse;font-size:12.5px;font-family:var(--f-mono);font-variant-numeric:tabular-nums;width:100%;}
+  table.lk th,table.lk td{border:1px solid var(--line);padding:4px 5px;text-align:center;cursor:pointer;}
+  table.lk th{font-family:var(--f-body);font-weight:700;color:var(--navy);background:var(--paper);position:sticky;top:0;z-index:1;}
+  table.lk th.rowh{position:static;}
+  table.lk td.rowh,table.lk th.rowh{font-weight:700;color:var(--navy);background:var(--paper);}
+  table.lk .xr{background:color-mix(in srgb, var(--amber-fill) 55%, transparent);}
+  table.lk .pin{background:var(--amber);color:var(--panel);font-weight:700;}
+  table.lk .hov{background:var(--tfill);}
+  .lk-read{min-height:42px;margin:8px 0;font-size:14px;padding:8px 12px;border-radius:9px;background:var(--paper);border:1px solid var(--line);}
+  .lk-scroll{overflow:auto;max-height:520px;border-radius:8px;}
+  .how{font-size:13.5px;color:var(--muted);margin:0 0 10px;}
+  .subhead{font-size:12px;font-weight:600;color:var(--muted);}
+
+  /* drawer */
+  .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;background:var(--amber);color:var(--panel);border:none;border-radius:24px;padding:11px 18px;font-weight:700;font-size:14px;font-family:var(--f-body);cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);background:var(--panel);border-left:1px solid var(--line);z-index:30;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:-8px 0 30px rgba(0,0,0,.18);}
+  .drawer.open{transform:none;}
+  @media (prefers-reduced-motion: reduce){.drawer{transition:none;}}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+  .drawer-head h3{font-family:var(--f-display);color:var(--navy);font-size:20px;margin:0;}
+  .drawer .lk-scroll{max-height:none;flex:1;}
+  .drawer-body{display:flex;flex-direction:column;flex:1;min-height:0;}
+
+  .theme-toggle{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;font-family:var(--f-body);color:var(--muted);cursor:pointer;z-index:15;}
+  footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;}
+  ::selection{background:var(--amber-fill);}
+  /* tabs */
+  .tabbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:12;background:color-mix(in srgb, var(--paper) 94%, transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);margin:0 -18px 26px;padding:10px 18px;}
+  .tabbar-inner{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;padding-right:90px;}
+  .tabbtn{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:5px 14px 5px 5px;font-size:13.5px;color:var(--ink);cursor:pointer;font-family:var(--f-body);font-weight:600;}
+  .tabbtn:hover{border-color:var(--navy-dim);}
+  .tabbtn[aria-selected="true"]{background:var(--navy);color:var(--panel);border-color:var(--navy);}
+  .tabbtn[aria-selected="true"] .secnum{background:var(--panel);color:var(--navy);}
+  .tabpane[hidden]{display:none!important;}
+  .next-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:30px;padding-top:18px;border-top:1px solid var(--line);}
+  .steps3{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px;}
+  @media(min-width:680px){.steps3{grid-template-columns:repeat(3,1fr);}}
+  .steps3 .s{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;min-width:0;}
+  .steps3 .s .k{font-family:var(--f-mono);font-size:11.5px;font-weight:600;color:var(--navy);letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:4px;}
+  .steps3 .s.on{border:2px solid var(--pv);background:var(--pv-fill);}
+  .decoder{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px;}
+  @media(min-width:680px){.decoder{grid-template-columns:1fr 1fr;}}
+  .decoder div{font-size:14px;padding:9px 12px;border-radius:9px;background:var(--paper);border:1px solid var(--line);min-width:0;}
+  .decoder b{color:var(--navy);}
+  .decoder .pv b{color:var(--pv);}
+  .stat.pv .v{color:var(--pv);}
+  .bandbtns{display:flex;flex-wrap:wrap;gap:8px;}
+  .formula-big{font-family:var(--f-mono);font-size:15px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:12px;line-height:1.7;overflow-x:auto;}
+  .formula-big .hl{color:var(--pv);font-weight:600;}
+  details.deeper{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);}
+  details.deeper > summary{cursor:pointer;padding:12px 16px;font-weight:600;color:var(--navy);}
+  details.deeper > div{padding:0 16px 16px;}
+  .jobs{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:680px){.jobs{grid-template-columns:1fr 1fr;}}
+  .job{border-radius:12px;padding:14px 16px;border:1px solid var(--line);min-width:0;}
+  .job.j1{background:var(--zfill);} .job.j2{background:var(--tfill);}
+  .job .tag{font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:4px;}
+  .job.j1 .tag{color:var(--zcol);} .job.j2 .tag{color:var(--tcol);}
+  .job p{margin:0 0 6px;font-size:14.5px;}
+
+</style>
+
+<button class="theme-toggle" id="themeToggle" type="button">Dark mode</button>
+<button class="fab" id="fab" type="button" aria-controls="drawer">Tables</button>
+
+<aside class="drawer" id="drawer" aria-label="Lookup tables" aria-hidden="true">
+  <div class="drawer-head">
+    <h3>Lookup tables</h3>
+    <button class="btn" id="drawerClose" type="button">Close</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">BIOL 200 · Hypothesis testing interactive</p>
+    <h1>Usual or unusual? Z, t, and the p-value</h1>
+    <p>Every hypothesis test asks one question: is my result the kind of thing that happens by chance all the time, or is it unusual? These six tabs build that idea one step at a time, starting with the 68/95/99.7 rule and ending with real scenarios you look up in the tables yourself.</p>
+    <div class="howto">
+      <span class="tag">How to use this page</span>
+      <p>Work through the tabs in order, 1 to 6. Each tab matches a section of your Canvas questions. The lookup tables are always one click away from the orange <b>Tables</b> button in the bottom corner.</p>
+    </div>
+  </header>
+
+  <nav class="tabbar" aria-label="Activity tabs">
+    <div class="tabbar-inner" role="tablist" id="tabbar">
+      <button class="tabbtn" role="tab" type="button" data-tab="normal" id="tb-normal"><span class="secnum small">1</span>Normal curve &amp; 68/95/99.7</button>
+      <button class="tabbtn" role="tab" type="button" data-tab="zt" id="tb-zt"><span class="secnum small">2</span>Z vs t</button>
+      <button class="tabbtn" role="tab" type="button" data-tab="pvalue" id="tb-pvalue"><span class="secnum small">3</span>Test statistic &amp; p-value</button>
+      <button class="tabbtn" role="tab" type="button" data-tab="errors" id="tb-errors"><span class="secnum small">4</span>Type I, Type II &amp; power</button>
+      <button class="tabbtn" role="tab" type="button" data-tab="scen" id="tb-scen"><span class="secnum small">5</span>Scenarios</button>
+      <button class="tabbtn" role="tab" type="button" data-tab="tables" id="tb-tables"><span class="secnum small">6</span>Tables</button>
+    </div>
+  </nav>
+
+  <!-- ===================== TAB 1 ===================== -->
+  <section class="tabpane" id="tab-normal" role="tabpanel" aria-labelledby="tb-normal">
+    <h2><span class="secnum">1</span>The normal curve and the 68/95/99.7 rule</h2>
+    <p class="lede">A forest survey has measured thousands of Douglas-fir trees in one stand. Their heights follow a normal curve with a mean of <b>μ = 15 m</b> and a standard deviation of <b>σ = 2.5 m</b>. The normal curve lets us say which heights are <b>usual</b> and which are <b>unusual</b>.</p>
+
+    <div class="panel">
+      <h3>Where do most trees fall?</h3>
+      <p class="note" style="margin-top:0;">Click a button to light up that zone.</p>
+      <div class="bandbtns" id="bandBtns">
+        <button class="btn" type="button" data-b="1">Within 1 SD</button>
+        <button class="btn sel" type="button" data-b="2">Within 2 SD</button>
+        <button class="btn" type="button" data-b="3">Within 3 SD</button>
+        <label class="check" style="margin-left:6px;"><input type="checkbox" id="exact196"> Show the exact 95% line (±1.96)</label>
+      </div>
+      <svg id="c1" viewBox="0 0 680 300" role="img" aria-label="Normal curve of tree heights with 68, 95 and 99.7 percent zones"></svg>
+      <div class="callout" id="bandMsg"></div>
+    </div>
+
+    <div class="explain-grid" style="margin-top:16px;">
+      <div class="explain-card"><div class="tag">68% · within 1 SD</div><p>About 2 out of 3 trees are between 12.5 and 17.5 m. Totally ordinary.</p></div>
+      <div class="explain-card"><div class="tag">95% · within 2 SD</div><p>Almost all trees are between 10 and 20 m. Only <b>5%</b> are outside this zone, 2.5% on each side.</p></div>
+      <div class="explain-card"><div class="tag">99.7% · within 3 SD</div><p>Practically every tree is between 7.5 and 22.5 m. Outside this is extremely rare.</p></div>
+    </div>
+    <div class="callout" style="margin-top:0;"><b>Where does "1.96" come from?</b> The "95% within 2 SD" rule is rounded. The exact line that holds the middle 95% is at <span class="big">1.96</span> SD. So whenever you see 1.96, read it as: "the edge of the usual 95%. Past this line, a result is in the unusual outer 5%."</div>
+
+    <div class="panel" style="margin-top:16px;">
+      <h3>Turn any tree into a z-score, then a probability</h3>
+      <p class="note" style="margin-top:0;">A z-score says how many standard deviations a value is from the mean. Once you have z, one table (the Z-table, also called Phi or Φ) gives the probability.</p>
+      <div class="controls">
+        <div class="field"><label for="x1">Tree height (x, meters)</label><div class="slider-row"><input type="range" id="x1" min="7" max="23" step="0.1" value="20"><output id="x1o" class="num">20.0</output></div></div>
+        <div class="field" style="flex:0 1 220px;"><label for="dir1">I want the chance a tree is…</label>
+          <select id="dir1"><option value="gt" selected>taller than x</option><option value="lt">shorter than x</option></select></div>
+      </div>
+      <svg id="c1b" viewBox="0 0 680 230" role="img" aria-label="Normal curve with the probability shaded"></svg>
+      <div class="formula-big" id="zcalc"></div>
+      <div class="stat-row">
+        <div class="stat"><span class="k">z-score</span><span class="v" id="z1">–</span></div>
+        <div class="stat z"><span class="k">Φ(z) from the Z-table</span><span class="v" id="phi1">–</span></div>
+        <div class="stat pv"><span class="k">Probability</span><span class="v" id="prob1">–</span></div>
+      </div>
+      <div class="sentence" id="sent1"></div>
+      <div class="mode-bar"><button class="btn" type="button" id="showInTable1">Show me this in the Z-table</button></div>
+    </div>
+    <p class="tryit-h">Try this</p>
+    <ol class="tryit">
+      <li>Click "Within 1 SD," "Within 2 SD," and "Within 3 SD." Read what percent of trees fall outside the 2 SD zone.</li>
+      <li>Set the tree height to 20 m, "taller than." Read the z-score and the percent of trees that are taller. Press "Show me this in the Z-table" to see where the number comes from.</li>
+    </ol>
+    <div class="next-row"><span></span><button class="cta" type="button" data-go="zt">Next: Z vs t →</button></div>
+  </section>
+
+  <!-- ===================== TAB 2 ===================== -->
+  <section class="tabpane" id="tab-zt" role="tabpanel" aria-labelledby="tb-zt" hidden>
+    <h2><span class="secnum">2</span>Z vs t: the same curve, with more caution</h2>
+    <p class="lede">Biologists use the Z-distribution for two different jobs. The t-distribution only shows up in the second one.</p>
+    <div class="jobs">
+      <div class="job j1"><span class="tag">Job 1 · One value → probability</span><p>"What's the chance a tree is taller than 20 m?" You know μ and σ for the population, so z = (x − μ) / σ and the Z-table gives the answer. This is what you did in Tab 1. Sample size doesn't matter here.</p><p><b>Always Z.</b></p></div>
+      <div class="job j2"><span class="tag">Job 2 · An average → test</span><p>"Is the average of my 9 trees different from 15 m?" Now the question is about a sample average. What matters is whether you know the true σ or only your sample's own SD (s).</p><p><b>σ known → Z. Only s → t.</b></p></div>
+    </div>
+
+    <div class="panel" style="margin-top:16px;">
+      <h3>Why does t need a wider "usual" zone?</h3>
+      <p class="note" style="margin-top:0;">When you estimate the spread from a small sample, chance results land far out more often. If you kept the Z line at ±1.96, too many ordinary results would be called "unusual." So t moves its line farther out. Slide n and watch.</p>
+      <div class="controls">
+        <div class="field">
+          <label for="n2">Sample size (n)</label>
+          <div class="slider-row"><input type="range" id="n2" min="2" max="61" value="4"><output id="n2o" class="num">4</output></div>
+        </div>
+        <label class="check"><input type="checkbox" id="showZ2" checked> Show the Z-curve for comparison</label>
+      </div>
+      <svg id="c2" viewBox="0 0 680 290" role="img" aria-label="t-curve compared with the Z-curve"></svg>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--tcol);height:3px;"></span>t-curve (df = <span id="leg2df" class="num">3</span>)</span>
+        <span><span class="sw" style="background:var(--zcol);height:3px;"></span>Z-curve</span>
+        <span><span class="sw" style="background:var(--amber-fill);border:1px solid var(--amber);"></span>t results landing past Z's 1.96 line</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="k">Degrees of freedom (n − 1)</span><span class="v" id="s2df">3</span></div>
+        <div class="stat z"><span class="k">Z: usual 95% ends at</span><span class="v">± 1.96</span></div>
+        <div class="stat"><span class="k">t: usual 95% ends at</span><span class="v" id="s2crit">–</span></div>
+        <div class="stat amber"><span class="k">If t kept the 1.96 line, "unusual" by chance</span><span class="v" id="s2tail">–</span></div>
+      </div>
+      <div class="callout" id="s2call"></div>
+    </div>
+    <p class="tryit-h">Try this</p>
+    <ol class="tryit">
+      <li>Set n to 3. Where does t's usual 95% zone end (the "t: usual 95% ends at" box)?</li>
+      <li>Slide n to 10, then 30, then all the way right. Watch what happens to t's line compared with Z's 1.96.</li>
+    </ol>
+
+    <details class="deeper">
+      <summary>Optional: watch fatter tails appear in a simulation</summary>
+      <div>
+        <p class="note">The computer pretends to measure thousands of small samples of trees from the stand (μ = 15 m, σ = 2.5 m). It scores each sample's average twice: once using the true σ (Z), once using that sample's own s (t). Both are measuring the same averages. The only difference is which spread you divide by.</p>
+        <div class="controls">
+          <div class="field" style="flex:0 1 200px;"><label for="n2s">Trees per sample (n)</label>
+            <select id="n2s"><option value="3">3</option><option value="5" selected>5</option><option value="10">10</option><option value="30">30</option></select></div>
+          <button class="cta" id="sim2" type="button">&#9654; Measure 3,000 samples</button>
+        </div>
+        <div class="twocol">
+          <div class="hcard z"><h3>Scored with the true σ (Z)</h3><svg id="c2z" viewBox="0 0 340 190" role="img" aria-label="Histogram of Z scores"></svg><div class="note" id="n2z">Press the button to run it.</div></div>
+          <div class="hcard t"><h3>Scored with each sample's s (t)</h3><svg id="c2t" viewBox="0 0 340 190" role="img" aria-label="Histogram of t scores"></svg><div class="note" id="n2t">&nbsp;</div></div>
+        </div>
+        <p class="note" id="s2simcall">Red bars are results past ±1.96, the "unusual" zone. With Z, about 5% land there, as the 95% rule promises. When a small sample happens to have a small s by luck, dividing by it inflates the score, so t gets more red bars.</p>
+      </div>
+    </details>
+
+    <div class="panel" style="margin-top:16px;">
+      <h3>Which table for Job 2?</h3>
+      <div class="tscroll">
+      <table class="cmp">
+        <thead><tr><th></th><th class="z">Z-distribution</th><th class="t">t-distribution</th></tr></thead>
+        <tbody>
+          <tr class="key"><th>Do you know the population σ?</th><td><b>Yes</b> (records, a manufacturer, national data)</td><td><b>No</b>, you calculated s from your sample</td></tr>
+          <tr><th>Typical sample size</th><td>Any; jamovi also uses Z for very large n</td><td>Any, especially small (n &lt; 30)</td></tr>
+          <tr><th>Degrees of freedom?</th><td>No, one table for everyone</td><td>Yes, df = n − 1 picks your row</td></tr>
+          <tr><th>Edge of usual 95% (α = 0.05)</th><td>±1.96, always</td><td>Changes with df (±2.776 at df 4, ±2.042 at df 30)</td></tr>
+          <tr><th>Standard error</th><td>SE = σ / √n</td><td>SE = s / √n</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="note">With large samples the t line is almost exactly 1.96, so Z and t give nearly the same answer. In biology, σ is rarely known, so tests of averages usually use t.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Quick sort: Z or t? <span class="score" id="sortScore">0 / 6</span></h3>
+      <p class="note" style="margin-top:0;">Read each question and choose a table. You'll see why right away.</p>
+      <div class="sort-list" id="sortList"></div>
+    </div>
+    <div class="next-row"><button class="btn" type="button" data-go="normal">← Back: 68/95/99.7</button><button class="cta" type="button" data-go="pvalue">Next: Test statistic &amp; p-value →</button></div>
+  </section>
+
+  <!-- ===================== TAB 3 ===================== -->
+  <section class="tabpane" id="tab-pvalue" role="tabpanel" aria-labelledby="tb-pvalue" hidden>
+    <h2><span class="secnum">3</span>The test statistic and the p-value</h2>
+    <p class="lede">A seed company's records say this tomato variety averages <b>50 cm</b> at 6 weeks, with <b>σ = 6 cm</b>. You grow plants with a new fertilizer and measure their average height. Does the fertilizer change height?</p>
+    <div class="steps3">
+      <div class="s"><span class="k">Step 1 · Hypotheses</span><b>H₀:</b> no real effect. Plants still average 50 cm.<br><b>H<sub>A</sub>:</b> there is a real effect.<br>Pick α, usually 0.05.</div>
+      <div class="s on"><span class="k">Step 2 · Test statistic</span>How many standard errors away is my result from what H₀ predicts?</div>
+      <div class="s"><span class="k">Step 3 · p-value</span>If H₀ is true, how likely is a result this extreme or more?<br>p &lt; α → reject H₀.</div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="field"><label for="xb3">Observed: your plants' average (cm)</label><div class="slider-row"><input type="range" id="xb3" min="44" max="58" step="0.1" value="53.5"><output id="xb3o" class="num">53.5</output></div></div>
+        <div class="field"><label for="n3">Number of plants (n)</label><div class="slider-row"><input type="range" id="n3" min="4" max="60" step="1" value="9"><output id="n3o" class="num">9</output></div></div>
+      </div>
+      <div class="formula-big" id="tscalc"></div>
+      <div class="controls" style="margin-top:14px;">
+        <div class="field" style="flex:0 1 240px;"><label for="tail3">What counts as "extreme"?</label>
+          <select id="tail3"><option value="2" selected>Taller OR shorter (two-tailed)</option><option value="1">Taller only (one-tailed)</option></select></div>
+        <div class="field" style="flex:0 1 150px;"><label for="a3">α (risk level)</label>
+          <select id="a3"><option value="0.01">0.01</option><option value="0.05" selected>0.05</option><option value="0.10">0.10</option></select></div>
+        <label class="check"><input type="checkbox" id="bands3"> Show 68/95/99.7 zones</label>
+      </div>
+      <svg id="c3" viewBox="0 0 680 340" role="img" aria-label="Probability curve of test statistics if H0 is true, with the observed result and p-value"></svg>
+      <div class="stat-row">
+        <div class="stat"><span class="k">Test statistic</span><span class="v" id="s3ts">–</span></div>
+        <div class="stat pv"><span class="k">p-value (shaded area)</span><span class="v" id="s3p">–</span></div>
+        <div class="stat"><span class="k">Compare to α</span><span class="v" id="s3a">–</span></div>
+        <div class="stat"><span class="k">Decision</span><span class="v" id="s3dec" style="font-size:14px;padding-top:4px;">–</span></div>
+      </div>
+      <div class="sentence" id="s3sent"></div>
+    </div>
+
+    <div class="panel">
+      <h3>How to read this figure</h3>
+      <div class="decoder">
+        <div><b>The curve.</b> Every test statistic you could get <i>if H₀ were true</i>, just from the luck of which plants you measured. It's the 68/95/99.7 curve again, centered on 0 ("exactly what H₀ predicts").</div>
+        <div><b>The bottom axis: "set of possible results."</b> Measured in test statistics, that is, standard errors away from 50 cm. The second row shows the same spots in centimeters.</div>
+        <div><b>The height: "probability density."</b> Tall in the middle means results near 50 cm are <b>more likely observations</b>. Low at the edges means far-out results are <b>very unlikely observations</b>.</div>
+        <div><b>The dot: "observed data point."</b> Your actual result, converted into a test statistic so it can be placed on the curve.</div>
+        <div class="pv"><b>The shaded area: the p-value.</b> The share of the curve at your dot <i>or farther out</i>. That is the chance of a result this extreme or more if H₀ is true.</div>
+        <div><b>The dashed α lines.</b> Where "unusual" starts. If your dot lands past them, the shaded area is smaller than α, so you reject H₀.</div>
+      </div>
+    </div>
+    <p class="tryit-h">Try this</p>
+    <ol class="tryit">
+      <li>Turn on "Show 68/95/99.7 zones." Keep n = 9 and slide the average from 50 up to 56. Stop when the dot leaves the middle 95%. What is the test statistic there, and what is p?</li>
+      <li>Set the average to 53.5 cm with n = 9 (two-tailed, α = 0.05). Read the p-value and the plain-language sentence under the stats.</li>
+    </ol>
+    <div class="not-grid">
+      <div class="not-card"><b>p is NOT the chance H₀ is true</b>p = 0.04 does not mean "4% chance the fertilizer does nothing." It means: if H₀ is true, there's a 4% chance of data this extreme.</div>
+      <div class="not-card"><b>p is NOT the size of the effect</b>With enough plants, a tiny 1 cm difference can give a very small p. Always look at the actual difference too.</div>
+      <div class="not-card"><b>A large p does NOT prove "no effect"</b>It means the difference could easily be natural variability. You "fail to reject" H₀; you never prove it.</div>
+    </div>
+    <div class="next-row"><button class="btn" type="button" data-go="zt">← Back: Z vs t</button><button class="cta" type="button" data-go="errors">Next: Type I, Type II &amp; power →</button></div>
+  </section>
+
+  <!-- ===================== TAB 4 ===================== -->
+  <section class="tabpane" id="tab-errors" role="tabpanel" aria-labelledby="tb-errors" hidden>
+    <h2><span class="secnum">4</span>Ways to be wrong: Type I, Type II, and power</h2>
+    <p class="lede">Every test ends with a decision, and the decision can be wrong in two different ways. Think of a fire alarm.</p>
+    <div class="panel">
+      <div class="egrid" role="table" aria-label="Type I and Type II errors">
+        <div class="hd" role="columnheader">True state of nature ↓ · Your conclusion →</div>
+        <div class="hd" role="columnheader">Fail to reject H₀<br><small>Alarm stays quiet</small></div>
+        <div class="hd" role="columnheader">Reject H₀<br><small>Alarm goes off</small></div>
+        <div class="rh" role="rowheader">H₀ is true<small>No real effect (no fire)</small></div>
+        <div class="okc"><b>Correct conclusion</b>Nothing happening, and you said so.</div>
+        <div class="e1"><b>Type I error · false positive</b>A fire alarm going off when there is no fire. You claim an effect that isn't real.<small>Chance = α (you choose it)</small></div>
+        <div class="rh" role="rowheader">H₀ is false<small>Real effect (real fire)</small></div>
+        <div class="e2"><b>Type II error · false negative</b>Ignoring the smoke and missing a real fire. A real effect goes undetected.<small>Chance = β</small></div>
+        <div class="okc"><b>Correct conclusion · power</b>You caught a real effect.<small>Chance = 1 − β</small></div>
+      </div>
+      <p class="note">Memory trick: Type <b>I</b> = "I see something that isn't there." Type <b>II</b> = "I'm too blind to see what IS there."</p>
+    </div>
+
+    <div class="panel">
+      <h3>See both errors on the curves</h3>
+      <p class="note" style="margin-top:0;">Same tomato study. The green curve is the "no effect" world (H₀ true). The blue curve is the real world if the fertilizer truly adds height. The dashed lines are the cutoffs your α sets.</p>
+      <div class="controls">
+        <div class="field"><label for="eff4">True effect of fertilizer (cm)</label><div class="slider-row"><input type="range" id="eff4" min="0" max="8" step="0.5" value="3"><output id="eff4o" class="num">3.0</output></div></div>
+        <div class="field"><label for="n4">Number of plants (n)</label><div class="slider-row"><input type="range" id="n4" min="4" max="60" step="1" value="16"><output id="n4o" class="num">16</output></div></div>
+        <div class="field" style="flex:0 1 140px;"><label for="a4">α</label><select id="a4"><option value="0.01">0.01</option><option value="0.05" selected>0.05</option><option value="0.10">0.10</option></select></div>
+      </div>
+      <svg id="c4" viewBox="0 0 680 270" role="img" aria-label="Null and real-effect curves with Type I and Type II error areas"></svg>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--bad);"></span>Type I (false positive) area</span>
+        <span><span class="sw" style="background:var(--amber);"></span>Type II (false negative) area</span>
+        <span><span class="sw" style="background:var(--good-fill);border:1px solid var(--good);"></span>Power (caught it)</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat bad"><span class="k">Type I chance (α)</span><span class="v" id="s4a">–</span></div>
+        <div class="stat amber"><span class="k">Type II chance (β)</span><span class="v" id="s4b">–</span></div>
+        <div class="stat good"><span class="k">Power (1 − β)</span><span class="v" id="s4p">–</span></div>
+      </div>
+      <div class="sentence" id="s4sent"></div>
+
+      <h3 style="margin-top:22px;">Run 100 studies</h3>
+      <p class="note" style="margin-top:0;">Each dot is one complete study using the settings above. Gray = correctly found nothing. Red = false positive. Green = caught a real effect. Amber = false negative.</p>
+      <button class="cta" id="run4" type="button">&#9654; Run 100 studies</button>
+      <div class="dots" id="dots4" aria-live="polite"></div>
+      <div class="note" id="dots4note"></div>
+    </div>
+    <div class="callout"><b>The trade-off.</b> Lowering α (your threshold) from 0.05 to 0.01 reduces false positives but raises false negatives. Use the stricter α = 0.01 when a false positive is costly, such as approving a dangerous drug or diagnosing a fatal disease.</div>
+    <p class="tryit-h">Try this</p>
+    <ol class="tryit">
+      <li>Set the true effect to 0 (the fertilizer does nothing). Click "Run 100 studies" three times and count the red dots (false positives) each time.</li>
+      <li>Set the effect to 3 cm and n to 8, then run 100 studies. Now raise n to 40 and run again. Did you get more or fewer amber dots (false negatives)?</li>
+    </ol>
+    <div class="next-row"><button class="btn" type="button" data-go="pvalue">← Back: p-value</button><button class="cta" type="button" data-go="scen">Next: Scenarios →</button></div>
+  </section>
+
+  <!-- ===================== TAB 5 ===================== -->
+  <section class="tabpane" id="tab-scen" role="tabpanel" aria-labelledby="tb-scen" hidden>
+    <h2><span class="secnum">5</span>Your turn: scenarios with the real tables</h2>
+    <p class="lede">Each scenario follows the same steps as lecture. Look values up in the tables yourself (orange <b>Tables</b> button), type your answer, and the page tells you if you're right.</p>
+    <p class="tryit-h">Try this</p>
+    <ol class="tryit" style="margin-bottom:16px;">
+      <li>Complete at least two scenarios. Aim for one where you <b>reject</b> H₀ and one where you <b>fail to reject</b> H₀ (you'll find out at Step 5).</li>
+      <li>For each one, notice three things: which table you used and why, what your test statistic says (how many standard errors away), and which error you could be making.</li>
+    </ol>
+    <div class="tabs" role="tablist" id="scTabs"></div>
+    <div class="panel" id="scPanel"></div>
+    <div class="next-row"><button class="btn" type="button" data-go="errors">← Back: errors</button><button class="cta" type="button" data-go="tables">Next: Tables →</button></div>
+  </section>
+
+  <!-- ===================== TAB 6 ===================== -->
+  <section class="tabpane" id="tab-tables" role="tabpanel" aria-labelledby="tb-tables" hidden>
+    <h2><span class="secnum">6</span>The tables</h2>
+    <p class="lede">Click any cell to pin it. The page reads the cell back to you in words, so you can check you're reading the table correctly.</p>
+    <div class="panel" id="inlineTables"></div>
+    <div class="next-row"><button class="btn" type="button" data-go="scen">← Back: Scenarios</button><span></span></div>
+  </section>
+
+  <footer>BIOL 200 · Hypothesis testing interactive · companion to the Hypothesis Testing Basics lecture and the Z-table vs t-table worksheet</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- theme ---------- */
+var root=document.documentElement, themeBtn=document.getElementById("themeToggle");
+function isDark(){var t=root.getAttribute("data-theme"); if(t) return t==="dark"; return window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;}
+function themeLabel(){themeBtn.textContent=isDark()?"Light mode":"Dark mode";}
+themeBtn.addEventListener("click",function(){root.setAttribute("data-theme",isDark()?"light":"dark");themeLabel();});
+themeLabel();
+
+/* ---------- math ---------- */
+function Phi(x){
+  if(x<-8) return 0; if(x>8) return 1;
+  var s=x,t=x,b=x*x,i=1;
+  while(s!==(s+(t*=b/(i+=2)))) s+=t;
+  return 0.5+s*Math.exp(-0.5*b-0.91893853320467274178);
+}
+function npdf(x){return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);}
+function logGamma(x){
+  var g=7,p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x<0.5) return Math.log(Math.PI/Math.sin(Math.PI*x))-logGamma(1-x);
+  x-=1; var a=p[0],t=x+g+0.5; for(var i=1;i<g+2;i++) a+=p[i]/(x+i);
+  return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);
+}
+function tpdf(t,v){var C=Math.exp(logGamma((v+1)/2)-logGamma(v/2))/Math.sqrt(v*Math.PI);return C*Math.pow(1+t*t/v,-(v+1)/2);}
+function tTwoTail(t,v){ // P(|T|>|t|) via Simpson
+  t=Math.abs(t); var N=800,h=t/N,s=tpdf(0,v)+tpdf(t,v);
+  for(var i=1;i<N;i++) s+=(i%2?4:2)*tpdf(i*h,v);
+  var half=s*h/3; return Math.max(0,1-2*half);
+}
+function tCrit(alpha2,v){var lo=0,hi=80;for(var k=0;k<60;k++){var m=(lo+hi)/2;if(tTwoTail(m,v)>alpha2) lo=m; else hi=m;}return (lo+hi)/2;}
+function zCrit(alpha2){var lo=0,hi=8;for(var k=0;k<60;k++){var m=(lo+hi)/2;if(2*(1-Phi(m))>alpha2) lo=m; else hi=m;}return (lo+hi)/2;}
+function randn(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function fmtP(p){ if(p<0.0001) return "< 0.0001"; if(p<0.001) return p.toFixed(4); return p.toFixed(3); }
+
+/* ---------- t table (two-tailed alpha columns) ---------- */
+var T_ALPHAS=[0.20,0.10,0.05,0.02,0.01];
+var T_ROWS=[[1,3.078,6.314,12.706,31.821,63.657],[2,1.886,2.920,4.303,6.965,9.925],[3,1.638,2.353,3.182,4.541,5.841],[4,1.533,2.132,2.776,3.747,4.604],[5,1.476,2.015,2.571,3.365,4.032],[6,1.440,1.943,2.447,3.143,3.707],[7,1.415,1.895,2.365,2.998,3.499],[8,1.397,1.860,2.306,2.896,3.355],[9,1.383,1.833,2.262,2.821,3.250],[10,1.372,1.812,2.228,2.764,3.169],[11,1.363,1.796,2.201,2.718,3.106],[12,1.356,1.782,2.179,2.681,3.055],[13,1.350,1.771,2.160,2.650,3.012],[14,1.345,1.761,2.145,2.624,2.977],[15,1.341,1.753,2.131,2.602,2.947],[16,1.337,1.746,2.120,2.583,2.921],[17,1.333,1.740,2.110,2.567,2.898],[18,1.330,1.734,2.101,2.552,2.878],[19,1.328,1.729,2.093,2.539,2.861],[20,1.325,1.725,2.086,2.528,2.845],[21,1.323,1.721,2.080,2.518,2.831],[22,1.321,1.717,2.074,2.508,2.819],[23,1.319,1.714,2.069,2.500,2.807],[24,1.318,1.711,2.064,2.492,2.797],[25,1.316,1.708,2.060,2.485,2.787],[26,1.315,1.706,2.056,2.479,2.779],[27,1.314,1.703,2.052,2.473,2.771],[28,1.313,1.701,2.048,2.467,2.763],[29,1.311,1.699,2.045,2.462,2.756],[30,1.310,1.697,2.042,2.457,2.750],[40,1.303,1.684,2.021,2.423,2.704],[60,1.296,1.671,2.000,2.390,2.660],[120,1.289,1.658,1.980,2.358,2.617],[Infinity,1.282,1.645,1.960,2.326,2.576]];
+
+/* ---------- SVG helper ---------- */
+var NS="http://www.w3.org/2000/svg";
+function mk(tag,a){var e=document.createElementNS(NS,tag);for(var k in a) e.setAttribute(k,a[k]);return e;}
+function Plot(svg,W,H,m,xmin,xmax,ymax){
+  var P={svg:svg};
+  P.x=function(v){return m.l+(v-xmin)/(xmax-xmin)*(W-m.l-m.r);};
+  P.y=function(v){return m.t+(1-v/ymax)*(H-m.t-m.b);};
+  P.clear=function(){while(svg.firstChild) svg.removeChild(svg.firstChild);};
+  P.add=function(tag,a){var e=mk(tag,a);svg.appendChild(e);return e;};
+  P.text=function(x,y,s,a){a=a||{};a.x=x;a.y=y;if(!a.fill)a.fill="var(--muted)";if(!a["font-size"])a["font-size"]="11";if(!a["font-family"])a["font-family"]="IBM Plex Mono, monospace";var e=P.add("text",a);e.textContent=s;return e;};
+  P.axis=function(ticks,fmt){
+    P.add("line",{x1:P.x(xmin),x2:P.x(xmax),y1:P.y(0),y2:P.y(0),stroke:"var(--muted)","stroke-width":1});
+    ticks.forEach(function(t){P.add("line",{x1:P.x(t),x2:P.x(t),y1:P.y(0),y2:P.y(0)+5,stroke:"var(--muted)","stroke-width":1});P.text(P.x(t),P.y(0)+18,fmt?fmt(t):String(t),{"text-anchor":"middle"});});
+  };
+  P.curve=function(fn,a,steps){steps=steps||200;var d="";for(var i=0;i<=steps;i++){var xv=xmin+(xmax-xmin)*i/steps;var yv=Math.min(fn(xv),ymax*1.05);d+=(i?"L":"M")+P.x(xv).toFixed(1)+","+P.y(yv).toFixed(1);}a.d=d;a.fill="none";return P.add("path",a);};
+  P.area=function(fn,a0,b0,a,steps){a0=Math.max(a0,xmin);b0=Math.min(b0,xmax);if(b0<=a0) return null;steps=steps||80;var d="M"+P.x(a0).toFixed(1)+","+P.y(0).toFixed(1);for(var i=0;i<=steps;i++){var xv=a0+(b0-a0)*i/steps;d+=" L"+P.x(xv).toFixed(1)+","+P.y(Math.min(fn(xv),ymax*1.05)).toFixed(1);}d+=" L"+P.x(b0).toFixed(1)+","+P.y(0).toFixed(1)+" Z";a.d=d;return P.add("path",a);};
+  return P;
+}
+
+
+/* =========== Tab 1: normal curve + 68/95/99.7 =========== */
+var MU=15, SIG=2.5, band=2;
+var P1=Plot(document.getElementById("c1"),680,300,{l:20,r:20,t:30,b:52},MU-4*SIG,MU+4*SIG,0.175);
+var f1=function(x){return npdf((x-MU)/SIG)/SIG;};
+function draw1(){
+  var exact=document.getElementById("exact196").checked;
+  P1.clear();
+  var shades=[{k:3,op:0.16},{k:2,op:0.30},{k:1,op:0.52}];
+  shades.forEach(function(s){
+    var on=s.k<=band;
+    P1.area(f1,MU-s.k*SIG,MU+s.k*SIG,{fill:on?"var(--tcol)":"var(--line)",opacity:on?s.op:0.35},120);
+  });
+  // outside zone
+  P1.area(f1,MU-4*SIG,MU-band*SIG,{fill:"var(--pv)",opacity:0.75});
+  P1.area(f1,MU+band*SIG,MU+4*SIG,{fill:"var(--pv)",opacity:0.75});
+  P1.axis([5,7.5,10,12.5,15,17.5,20,22.5,25],function(t){return t+" m";});
+  [-4,-3,-2,-1,0,1,2,3,4].forEach(function(k){P1.text(P1.x(MU+k*SIG),P1.y(0)+36,(k>0?"+":"")+k+" SD",{"text-anchor":"middle",fill:"var(--navy)","font-size":"10.5"});});
+  P1.curve(f1,{stroke:"var(--ink)","stroke-width":2.2},240);
+  // segment percent labels
+  var seg=[[0,1,"34.1%"],[1,2,"13.6%"],[2,3,"2.1%"]];
+  seg.forEach(function(s){[1,-1].forEach(function(sg){var mid=MU+sg*(s[0]+s[1])/2*SIG; var yy=Math.min(f1(mid)*0.45,0.06);
+    if(s[1]===3) yy=0.012;
+    P1.text(P1.x(mid),P1.y(yy),s[2],{"text-anchor":"middle",fill:"var(--ink)","font-size":"11","font-weight":"600"});});});
+  if(exact){[-1.96,1.96].forEach(function(k){var x=MU+k*SIG;P1.add("line",{x1:P1.x(x),x2:P1.x(x),y1:P1.y(0),y2:P1.y(0.165),stroke:"var(--amber)","stroke-width":2,"stroke-dasharray":"5,3"});});
+    P1.text(P1.x(MU+1.96*SIG)+5,P1.y(0.16),"exact 95% line: 1.96 SD = "+(MU+1.96*SIG).toFixed(1)+" m",{fill:"var(--amber)","font-weight":"600"});}
+  var inside={1:68,2:95,3:99.7}[band], lo=MU-band*SIG, hi=MU+band*SIG, outside=(100-inside), each=outside/2;
+  P1.text(P1.x(MU),P1.y(0.168),"usual: middle "+inside+"%",{"text-anchor":"middle",fill:"var(--navy)","font-weight":"600","font-size":"12.5"});
+  document.getElementById("bandMsg").innerHTML="About <span class='big'>"+inside+"%</span> of trees are within "+band+" SD of the mean, between <b>"+lo.toFixed(1)+"</b> and <b>"+hi.toFixed(1)+" m</b>. The purple tails hold the other <b>"+(+outside.toFixed(1))+"%</b> ("+(+each.toFixed(2))+"% on each side)."+(band===2?" This outer 5% is what statistics calls <b>unusual</b>.":"");
+}
+document.querySelectorAll("#bandBtns [data-b]").forEach(function(b){b.addEventListener("click",function(){band=+b.getAttribute("data-b");document.querySelectorAll("#bandBtns [data-b]").forEach(function(x){x.classList.toggle("sel",x===b);});draw1();});});
+document.getElementById("exact196").addEventListener("change",draw1);
+
+var P1b=Plot(document.getElementById("c1b"),680,230,{l:20,r:20,t:14,b:52},MU-4*SIG,MU+4*SIG,0.175);
+var x1=document.getElementById("x1"), dir1=document.getElementById("dir1"), lastZ1=0;
+function draw1b(){
+  var x=parseFloat(x1.value), gt=dir1.value==="gt";
+  document.getElementById("x1o").textContent=x.toFixed(1);
+  var z=(x-MU)/SIG, zr=Math.round(z*100)/100, phiAbs=+Phi(Math.abs(zr)).toFixed(4), phi=zr>=0?phiAbs:+(1-phiAbs).toFixed(4);
+  var prob=gt?1-phi:phi; lastZ1=zr;
+  P1b.clear();
+  P1b.area(f1,MU-4*SIG,MU+4*SIG,{fill:"var(--zfill)"},120);
+  if(gt) P1b.area(f1,x,MU+4*SIG,{fill:"var(--pv)",opacity:0.8}); else P1b.area(f1,MU-4*SIG,x,{fill:"var(--pv)",opacity:0.8});
+  P1b.axis([5,7.5,10,12.5,15,17.5,20,22.5,25],function(t){return t+" m";});
+  [-4,-3,-2,-1,0,1,2,3,4].forEach(function(k){P1b.text(P1b.x(MU+k*SIG),P1b.y(0)+36,"z = "+k,{"text-anchor":"middle",fill:"var(--navy)","font-size":"10.5"});});
+  P1b.curve(f1,{stroke:"var(--zcol)","stroke-width":2.2},240);
+  P1b.add("line",{x1:P1b.x(x),x2:P1b.x(x),y1:P1b.y(0),y2:P1b.y(0.15),stroke:"var(--ink)","stroke-width":2});
+  var right=x<21;
+  P1b.text(P1b.x(x)+(right?6:-6),P1b.y(0.14),"x = "+x.toFixed(1)+" m  (z = "+zr.toFixed(2)+")",{fill:"var(--ink)","font-weight":"600","text-anchor":right?"start":"end"});
+  document.getElementById("zcalc").innerHTML="z = (x − μ) / σ = ("+x.toFixed(1)+" − 15) / 2.5 = <span class='hl'>"+zr.toFixed(2)+"</span> &nbsp;→&nbsp; this tree is "+Math.abs(zr).toFixed(2)+" standard deviations "+(zr>=0?"above":"below")+" average.";
+  document.getElementById("z1").textContent=zr.toFixed(2);
+  document.getElementById("phi1").textContent=phi.toFixed(4);
+  document.getElementById("prob1").textContent=(prob*100).toFixed(1)+"%";
+  var s="<b>In plain words:</b> about <b>"+(prob*100).toFixed(1)+"%</b> of trees in this stand are "+(gt?"taller":"shorter")+" than "+x.toFixed(1)+" m. ";
+  s+= gt ? "The Z-table gives the area to the LEFT (shorter), Φ = "+phi.toFixed(4)+", so taller = 1 − "+phi.toFixed(4)+" = "+(1-phi).toFixed(4)+"." : "The Z-table gives the area to the LEFT, so shorter = Φ = "+phi.toFixed(4)+".";
+  if(zr<0) s+=" (The table only lists positive z. For a negative z, look up "+Math.abs(zr).toFixed(2)+" and use 1 − that value: 1 − "+phiAbs.toFixed(4)+" = "+phi.toFixed(4)+".)";
+  if(Math.abs(zr)>=1.96) s+=" A tree like this is in the <b>unusual</b> outer 5%."; else s+=" A tree like this is within the <b>usual</b> middle 95%.";
+  document.getElementById("sent1").innerHTML=s;
+}
+x1.addEventListener("input",draw1b); dir1.addEventListener("change",draw1b);
+document.getElementById("showInTable1").addEventListener("click",function(){
+  var a=Math.min(Math.abs(lastZ1),3.49), r=Math.floor(Math.round(a*100)/10+1e-9), c=Math.round(a*100)-r*10;
+  openDrawer("z"); pinCell("drZT",r,c);
+});
+
+/* =========== Tab 2: Z vs t curves =========== */
+var n2=document.getElementById("n2"), showZ2=document.getElementById("showZ2");
+var P2=Plot(document.getElementById("c2"),680,290,{l:20,r:20,t:16,b:34},-5,5,0.43);
+function draw2(){
+  var n=parseInt(n2.value,10), df=n-1;
+  document.getElementById("n2o").textContent=n; document.getElementById("leg2df").textContent=df; document.getElementById("s2df").textContent=df;
+  var f=function(x){return tpdf(x,df);};
+  P2.clear();
+  P2.area(f,-5,-1.96,{fill:"var(--amber-fill)",stroke:"var(--amber)","stroke-width":0.8});
+  P2.area(f,1.96,5,{fill:"var(--amber-fill)",stroke:"var(--amber)","stroke-width":0.8});
+  P2.axis([-4,-3,-2,-1,0,1,2,3,4]);
+  if(showZ2.checked) P2.curve(npdf,{stroke:"var(--zcol)","stroke-width":2,"stroke-dasharray":"6,4"});
+  P2.curve(f,{stroke:"var(--tcol)","stroke-width":2.6});
+  [-1.96,1.96].forEach(function(x){P2.add("line",{x1:P2.x(x),x2:P2.x(x),y1:P2.y(0),y2:P2.y(0.34),stroke:"var(--zcol)","stroke-width":1.2,"stroke-dasharray":"3,3"});});
+  P2.text(P2.x(1.96)+4,P2.y(0.33),"Z line ±1.96",{fill:"var(--zcol)","font-weight":"600"});
+  var tail=tTwoTail(1.96,df), crit=tCrit(0.05,df);
+  if(crit<5){[-crit,crit].forEach(function(x){P2.add("line",{x1:P2.x(x),x2:P2.x(x),y1:P2.y(0),y2:P2.y(0.25),stroke:"var(--tcol)","stroke-width":1.6});});
+    P2.text(P2.x(crit)+4,P2.y(0.24),"t line ±"+crit.toFixed(2),{fill:"var(--tcol)","font-weight":"600"});}
+  else P2.text(P2.x(4.95),P2.y(0.24),"t line ±"+crit.toFixed(2)+" →",{fill:"var(--tcol)","font-weight":"600","text-anchor":"end"});
+  document.getElementById("s2tail").textContent=(tail*100).toFixed(1)+"%";
+  document.getElementById("s2crit").textContent="± "+crit.toFixed(3);
+  var msg;
+  if(df<=3) msg="With only <b>"+n+"</b> measurements, if you used the Z line at ±1.96, <span class='big'>"+(tail*100).toFixed(1)+"%</span> of ordinary chance results would be called \"unusual,\" not 5%. That's far too many false alarms. So t moves its line out to <span class='big'>±"+crit.toFixed(2)+"</span>. You need much stronger evidence with tiny samples.";
+  else if(df<29) msg="With <b>"+n+"</b> measurements, the Z line would flag <span class='big'>"+(tail*100).toFixed(1)+"%</span> of chance results as unusual. t's line at <span class='big'>±"+crit.toFixed(2)+"</span> brings that back to 5%. It's a little wider than 1.96: t is Z's more cautious cousin.";
+  else msg="With <b>"+n+"</b> measurements, t and Z almost match: <span class='big'>"+(tail*100).toFixed(1)+"%</span> vs 5%, and a line at <span class='big'>±"+crit.toFixed(2)+"</span> vs ±1.96. Your estimate of the spread is now good enough that t has basically become Z.";
+  document.getElementById("s2call").innerHTML=msg;
+}
+n2.addEventListener("input",draw2); showZ2.addEventListener("change",draw2);
+
+var P2z=Plot(document.getElementById("c2z"),340,190,{l:10,r:10,t:10,b:28},-6,6,0.5);
+var P2t=Plot(document.getElementById("c2t"),340,190,{l:10,r:10,t:10,b:28},-6,6,0.5);
+function hist(P,vals,col,overlay){
+  P.clear(); var bins=48,w=12/bins,c=new Array(bins).fill(0),N=vals.length,beyond=0;
+  vals.forEach(function(v){if(Math.abs(v)>1.96) beyond++; if(v<-6||v>=6) return; c[Math.floor((v+6)/w)]++;});
+  for(var i=0;i<bins;i++){var d=c[i]/(N*w); if(d<=0) continue; var x0=-6+i*w; var out=(x0+w<=-1.96)||(x0>=1.96);
+    P.add("rect",{x:P.x(x0).toFixed(1),y:P.y(Math.min(d,0.5)).toFixed(1),width:Math.max(0.5,P.x(x0+w)-P.x(x0)-0.8).toFixed(1),height:(P.y(0)-P.y(Math.min(d,0.5))).toFixed(1),fill:out?"var(--bad)":col,opacity:out?0.75:0.6});}
+  P.axis([-4,-2,0,2,4]);
+  P.curve(overlay,{stroke:"var(--ink)","stroke-width":1.4,opacity:0.7});
+  return beyond/N;
+}
+document.getElementById("sim2").addEventListener("click",function(){
+  var n=parseInt(document.getElementById("n2s").value,10), N=3000, zs=[], ts=[];
+  for(var k=0;k<N;k++){var s=0,arr=[];for(var i=0;i<n;i++){var v=MU+SIG*randn();arr.push(v);s+=v;} var m=s/n,ss=0; arr.forEach(function(v){ss+=(v-m)*(v-m);}); var sd=Math.sqrt(ss/(n-1));
+    zs.push((m-MU)/(SIG/Math.sqrt(n))); ts.push((m-MU)/(sd/Math.sqrt(n)));}
+  var bz=hist(P2z,zs,"var(--zcol)",npdf), bt=hist(P2t,ts,"var(--tcol)",function(x){return tpdf(x,n-1);});
+  document.getElementById("n2z").innerHTML="<b class='num' style='color:var(--bad)'>"+(bz*100).toFixed(1)+"%</b> landed in the unusual zone past ±1.96 (the 95% rule says 5%).";
+  document.getElementById("n2t").innerHTML="<b class='num' style='color:var(--bad)'>"+(bt*100).toFixed(1)+"%</b> of the same samples landed past ±1.96.";
+  document.getElementById("s2simcall").innerHTML="Same trees, same averages. Using each sample's own s pushed <b>"+(bt*100).toFixed(1)+"%</b> of results into the unusual zone instead of about 5%. "+(n>=30?"With 30 trees, s is a good estimate of σ, so the two histograms nearly match.":"That's why small samples need the t-table's wider lines.");
+});
+
+/* =========== Tab 3: test statistic + p-value figure =========== */
+var xb3=document.getElementById("xb3"),n3=document.getElementById("n3"),tail3=document.getElementById("tail3"),a3=document.getElementById("a3"),bands3=document.getElementById("bands3");
+var P3=Plot(document.getElementById("c3"),680,340,{l:70,r:20,t:58,b:66},-4.2,4.2,0.42);
+function bracket(P,x0,x1,y,label,anchor){
+  var a=P.x(x0),b=P.x(x1),yy=P.y(y);
+  P.add("path",{d:"M"+a+","+(yy+8)+" L"+a+","+yy+" L"+b+","+yy+" L"+b+","+(yy+8)+" M"+((a+b)/2)+","+yy+" L"+((a+b)/2)+","+(yy-8),fill:"none",stroke:"var(--muted)","stroke-width":1.2});
+  P.text((a+b)/2,yy-13,label,{"text-anchor":anchor||"middle",fill:"var(--ink)","font-size":"12.5","font-family":"Inter, system-ui, sans-serif"});
+}
+function draw3(){
+  var xb=parseFloat(xb3.value), n=parseInt(n3.value,10), tails=parseInt(tail3.value,10), alpha=parseFloat(a3.value);
+  document.getElementById("xb3o").textContent=xb.toFixed(1); document.getElementById("n3o").textContent=n;
+  var se=6/Math.sqrt(n), ts=(xb-50)/se, p=tails===2?2*(1-Phi(Math.abs(ts))):1-Phi(ts);
+  var zc=tails===2?zCrit(alpha):zCrit(2*alpha);
+  P3.clear();
+  if(bands3.checked){
+    [{k:3,op:0.12},{k:2,op:0.22},{k:1,op:0.36}].forEach(function(s){P3.area(npdf,-s.k,s.k,{fill:"var(--tcol)",opacity:s.op},120);});
+    [[0.5,"34.1%"],[1.5,"13.6%"],[2.5,"2.1%"]].forEach(function(q){[1,-1].forEach(function(sg){P3.text(P3.x(sg*q[0]),P3.y(q[0]<1?0.12:(q[0]<2?0.04:0.012)),q[1],{"text-anchor":"middle",fill:"var(--navy)","font-size":"10.5","font-weight":"600"});});});
+  }
+  // p-value shading
+  var a=Math.abs(ts);
+  if(tails===2){P3.area(npdf,a,4.2,{fill:"var(--pv)",opacity:0.75});P3.area(npdf,-4.2,-a,{fill:"var(--pv)",opacity:0.75});}
+  else P3.area(npdf,ts,4.2,{fill:"var(--pv)",opacity:0.75});
+  // axes
+  P3.add("line",{x1:P3.x(-4.2),x2:P3.x(4.2),y1:P3.y(0),y2:P3.y(0),stroke:"var(--muted)","stroke-width":1});
+  [-4,-3,-2,-1,0,1,2,3,4].forEach(function(t){P3.add("line",{x1:P3.x(t),x2:P3.x(t),y1:P3.y(0),y2:P3.y(0)+5,stroke:"var(--muted)"});
+    P3.text(P3.x(t),P3.y(0)+18,String(t),{"text-anchor":"middle",fill:"var(--navy)","font-weight":"600"});
+    P3.text(P3.x(t),P3.y(0)+33,(50+t*se).toFixed(1),{"text-anchor":"middle","font-size":"10"});});
+  P3.text(P3.x(-4.2),P3.y(0)+18,"test stat",{"text-anchor":"end",fill:"var(--navy)","font-size":"10"});
+  P3.text(P3.x(-4.2),P3.y(0)+33,"cm",{"text-anchor":"end","font-size":"10"});
+  P3.text(P3.x(0),P3.y(0)+54,"Set of possible results (if H₀ is true)",{"text-anchor":"middle",fill:"var(--muted)","font-size":"12","font-family":"Inter, system-ui, sans-serif"});
+  P3.text(16,P3.y(0.2),"Probability density",{"text-anchor":"middle",fill:"var(--muted)","font-size":"11.5","font-family":"Inter, system-ui, sans-serif",transform:"rotate(-90 16 "+P3.y(0.2)+")"});
+  P3.curve(npdf,{stroke:"var(--ink)","stroke-width":2.4},240);
+  // alpha lines
+  var aLines=tails===2?[-zc,zc]:[zc];
+  aLines.forEach(function(x){P3.add("line",{x1:P3.x(x),x2:P3.x(x),y1:P3.y(0),y2:P3.y(0.2),stroke:"var(--bad)","stroke-width":1.4,"stroke-dasharray":"5,4"});});
+  P3.text(P3.x(zc)+4,P3.y(0.2)+2,"α line "+(tails===2?"±":"")+zc.toFixed(2),{fill:"var(--bad)","font-size":"10.5","font-weight":"600"});
+  // labels like the lecture figure
+  bracket(P3,-0.4,0.4,0.43,"More likely observations");
+  bracket(P3,-4.0,-3.3,0.07,"Very unlikely");
+  bracket(P3,3.3,4.0,0.07,"Very unlikely");
+  // observed dot
+  var tx=Math.max(-4.1,Math.min(4.1,ts)), off=Math.abs(ts)>4.1;
+  P3.add("circle",{cx:P3.x(tx),cy:P3.y(0),r:7,fill:"var(--ink)"});
+  var lx=P3.x(tx), lright=tx<1.2;
+  var lbl="Observed: "+ts.toFixed(2)+(off?(ts>0?" →":" ←"):"");
+  var bx=lright?lx+12:lx-12, by=P3.y(0.19);
+  P3.add("line",{x1:lx,y1:P3.y(0)-7,x2:bx,y2:by+6,stroke:"var(--ink)","stroke-width":1});
+  var tw=lbl.length*7.2+14;
+  P3.add("rect",{x:lright?bx:bx-tw,y:by-12,width:tw,height:22,rx:5,fill:"var(--navy)"});
+  P3.text(lright?bx+7:bx-tw+7,by+3,lbl,{fill:"var(--panel)","font-weight":"600","font-size":"12"});
+  // p-value label (like the lecture figure)
+  var edge=tails===2?a:ts;
+  var tgt=Math.min(Math.max(edge,-3.9)+0.3,4.0);
+  var boxX=Math.min(Math.max(tgt+0.5,1.6),2.5), boxY=0.3;
+  var bxp=P3.x(boxX);
+  P3.add("rect",{x:bxp-4,y:P3.y(boxY)-15,width:122,height:22,rx:5,fill:"var(--pv)"});
+  P3.text(bxp+4,P3.y(boxY)+1,"p-value = "+fmtP(p),{fill:"var(--panel)","font-weight":"700","font-size":"12"});
+  P3.add("line",{x1:bxp+30,y1:P3.y(boxY)+7,x2:P3.x(tgt),y2:P3.y(npdf(tgt)*0.45),stroke:"var(--pv)","stroke-width":1.4});
+  document.getElementById("tscalc").innerHTML="test statistic = <span style='color:var(--muted)'>(Observed − Expected) / Standard error</span><br>"+
+    "SE = σ / √n = 6 / √"+n+" = <b>"+se.toFixed(2)+" cm</b> &nbsp;<span style='color:var(--muted)'>(how much an average wobbles by chance)</span><br>"+
+    "test statistic = ("+xb.toFixed(1)+" − 50) / "+se.toFixed(2)+" = <span class='hl'>"+ts.toFixed(2)+"</span> &nbsp;→&nbsp; your result is <b>"+Math.abs(ts).toFixed(2)+" standard errors "+(ts>=0?"above":"below")+"</b> what H₀ predicts.";
+  document.getElementById("s3ts").textContent=ts.toFixed(2);
+  document.getElementById("s3p").textContent=fmtP(p);
+  var rej=p<alpha;
+  document.getElementById("s3a").textContent=(rej?"p < ":"p ≥ ")+alpha;
+  document.getElementById("s3dec").innerHTML=rej?"<span class='verdict rej'>Reject H₀</span>":"<span class='verdict fail'>Fail to reject H₀</span>";
+  var pct=p*100, pctTxt=pct<0.1?"less than 0.1%":(pct<10?pct.toFixed(1)+"%":Math.round(pct)+"%");
+  var s="<b>p = "+fmtP(p)+"</b> → If H₀ is true (the fertilizer does nothing), there is a <b>"+pctTxt+"</b> chance of seeing data this extreme"+(tails===2?" (this far from 50 cm, in either direction)":" (this tall or taller)")+". ";
+  if(tails===1 && ts<0) s+="Your plants were actually shorter, so for a \"taller only\" test this isn't evidence at all. ";
+  s+= rej ? "That's below α = "+alpha+", so the result is <b>statistically significant</b>: too unlikely to be explained by chance alone. <b>Reject H₀.</b>" : "That's not below α = "+alpha+", so the difference could easily be natural variability (random chance). <b>Fail to reject H₀.</b>";
+  var zone=Math.abs(ts)<1?"inside the middle 68%":(Math.abs(ts)<1.96?"inside the usual middle 95%":(Math.abs(ts)<3?"out in the unusual outer 5%":"beyond 3 SE, in the extremely rare outer 0.3%"));
+  s+=" <span style='color:var(--muted)'>(68/95/99.7 check: a test statistic of "+ts.toFixed(2)+" is "+zone+".)</span>";
+  document.getElementById("s3sent").innerHTML=s;
+}
+[xb3,n3].forEach(function(e){e.addEventListener("input",draw3);}); [tail3,a3,bands3].forEach(function(e){e.addEventListener("change",draw3);});
+
+/* =========== Tab tabs =========== */
+var TABS=["normal","zt","pvalue","errors","scen","tables"];
+function showTab(id,scroll){
+  if(TABS.indexOf(id)<0) id="normal";
+  TABS.forEach(function(t){document.getElementById("tab-"+t).hidden=(t!==id); var b=document.getElementById("tb-"+t); b.setAttribute("aria-selected",t===id?"true":"false"); b.tabIndex=t===id?0:-1;});
+  var btn=document.getElementById("tb-"+id); if(btn.scrollIntoView) btn.scrollIntoView({block:"nearest",inline:"center"});
+  try{ if(history.replaceState) history.replaceState(null,"","#"+id); }catch(e){}
+  if(scroll){ var bar=document.querySelector(".tabbar"); window.scrollTo({top:Math.max(0,bar.offsetTop-2),behavior:"auto"}); }
+}
+document.querySelectorAll(".tabbtn").forEach(function(b){b.addEventListener("click",function(){showTab(b.getAttribute("data-tab"),false);});});
+document.getElementById("tabbar").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+  var cur=TABS.indexOf((document.querySelector(".tabbtn[aria-selected='true']")||{}).getAttribute("data-tab"));
+  var nx=TABS[(cur+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; showTab(nx,false); document.getElementById("tb-"+nx).focus();
+});
+document.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){showTab(b.getAttribute("data-go"),true);});});
+
+/* =========== Tab 2: card sort =========== */
+var SORT=[
+  {q:"A lab knows from 20 years of colony records that σ for adult mouse body mass is 2.1 g. They weigh 40 mice on a new diet.",a:"z",why:"σ is known from long-term records, so Z."},
+  {q:"You time how far 8 leopard frogs jump. No one has published the spread for this population, so you calculate s from your 8 frogs.",a:"t",why:"σ is unknown and you estimated s yourself, so t with df = 8 − 1 = 7."},
+  {q:"National growth charts give σ = 2.5 cm for infant length at 6 months. A clinic measures 15 infants.",a:"z",why:"Even though n is small, σ is known from national data, so Z. The question is about σ, not just n."},
+  {q:"45 students record their resting heart rate. You only have the sample SD (s) from those 45 students.",a:"t",why:"σ is unknown, so t with df = 44. Because n is large, t* will be very close to Z's 1.96 anyway."},
+  {q:"A thermometer manufacturer guarantees readings vary with σ = 0.2 °C. You take 10 readings of a water bath.",a:"z",why:"The manufacturer gives the population σ, so Z."},
+  {q:"You count bacterial colonies on 5 petri dishes and calculate the mean and s.",a:"t",why:"Small sample, σ unknown, so t with df = 4."}
+];
+var sortState=SORT.map(function(){return null;});
+function buildSort(){
+  var host=document.getElementById("sortList"); host.innerHTML="";
+  SORT.forEach(function(it,i){
+    var c=document.createElement("div"); c.className="sort-card";
+    c.innerHTML="<p>"+(i+1)+". "+it.q+"</p><div class='btns'><button class='btn' type='button' data-v='z'>Z-table</button><button class='btn' type='button' data-v='t'>t-table</button></div><div class='fb' hidden></div>";
+    c.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){
+      var v=b.getAttribute("data-v"); sortState[i]=(v===it.a);
+      c.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===b);});
+      var fb=c.querySelector(".fb"); fb.hidden=false; fb.className="fb "+(v===it.a?"ok":"no");
+      fb.textContent=(v===it.a?"Correct. ":"Not quite. ")+it.why;
+      document.getElementById("sortScore").textContent=sortState.filter(function(s){return s===true;}).length+" / "+SORT.length;
+    });});
+    host.appendChild(c);
+  });
+}
+
+/* =========== Tab 4: errors =========== */
+var eff4=document.getElementById("eff4"),n4=document.getElementById("n4"),a4=document.getElementById("a4");
+var P4=Plot(document.getElementById("c4"),680,270,{l:20,r:20,t:16,b:34},40,64,0.5);
+function errStats(){
+  var eff=parseFloat(eff4.value),n=parseInt(n4.value,10),alpha=parseFloat(a4.value),se=6/Math.sqrt(n),zc=zCrit(alpha);
+  var lo=50-zc*se,hi=50+zc*se,mu1=50+eff;
+  var beta=Phi((hi-mu1)/se)-Phi((lo-mu1)/se);
+  return {eff:eff,n:n,alpha:alpha,se:se,zc:zc,lo:lo,hi:hi,mu1:mu1,beta:beta};
+}
+function draw4(){
+  var S=errStats();
+  document.getElementById("eff4o").textContent=S.eff.toFixed(1); document.getElementById("n4o").textContent=S.n;
+  var f0=function(x){return npdf((x-50)/S.se)/S.se;}, f1=function(x){return npdf((x-S.mu1)/S.se)/S.se;};
+  P4.clear();
+  if(S.eff>0){
+    P4.area(f1,S.hi,64,{fill:"var(--good-fill)",stroke:"none"},120);
+    P4.area(f1,S.lo,S.hi,{fill:"var(--amber)",opacity:0.65},120);
+  }
+  P4.area(f0,S.hi,64,{fill:"var(--bad)",opacity:0.85});
+  P4.area(f0,40,S.lo,{fill:"var(--bad)",opacity:0.85});
+  P4.axis([40,44,48,52,56,60,64]);
+  P4.text(P4.x(64),P4.y(0)+30,"cm",{"text-anchor":"end","font-size":"10"});
+  P4.curve(f0,{stroke:"var(--zcol)","stroke-width":2.2},260);
+  if(S.eff>0) P4.curve(f1,{stroke:"var(--tcol)","stroke-width":2.2},260);
+  [S.lo,S.hi].forEach(function(x){if(x>40&&x<64){P4.add("line",{x1:P4.x(x),x2:P4.x(x),y1:P4.y(0),y2:P4.y(0.48),stroke:"var(--ink)","stroke-width":1.2,"stroke-dasharray":"5,4"});}});
+  P4.text(P4.x(S.hi)+4,P4.y(0.48)+10,"cutoff "+S.hi.toFixed(1),{fill:"var(--ink)"});
+  P4.text(P4.x(50)-8,P4.y(Math.min(f0(50),0.5))-6,"no effect (H₀)",{"text-anchor":"end",fill:"var(--zcol)","font-weight":"600"});
+  if(S.eff>0) P4.text(P4.x(S.mu1)+8,P4.y(Math.min(f1(S.mu1),0.5))-6,"real effect +"+S.eff.toFixed(1)+" cm",{"text-anchor":"start",fill:"var(--tcol)","font-weight":"600"});
+  document.getElementById("s4a").textContent=(S.alpha*100).toFixed(0)+"%";
+  document.getElementById("s4b").textContent=S.eff>0?(S.beta*100).toFixed(1)+"%":"n/a";
+  document.getElementById("s4p").textContent=S.eff>0?((1-S.beta)*100).toFixed(1)+"%":"n/a";
+  var s;
+  if(S.eff===0) s="With no real effect, the only mistake possible is a <b>Type I error (false positive)</b>. It happens "+Math.round(S.alpha*100)+"% of the time, exactly the α you picked. A Type II error can't happen because there's nothing to miss.";
+  else s="If the fertilizer truly adds "+S.eff.toFixed(1)+" cm, a study with "+S.n+" plants would <b>miss it "+(S.beta*100).toFixed(0)+"% of the time</b> (Type II) and catch it "+((1-S.beta)*100).toFixed(0)+"% of the time (power). "+(S.beta>0.5?"That's a weak study: more plants or a bigger effect would help.":(S.beta>0.2?"Decent, but many researchers aim for at least 80% power.":"That's a strong study."));
+  document.getElementById("s4sent").innerHTML=s;
+}
+[eff4,n4].forEach(function(e){e.addEventListener("input",draw4);}); a4.addEventListener("change",draw4);
+var dotsHost=document.getElementById("dots4");
+function emptyDots(){dotsHost.innerHTML="";for(var i=0;i<100;i++){var d=document.createElement("div");d.className="dot";dotsHost.appendChild(d);}}
+document.getElementById("run4").addEventListener("click",function(){
+  var S=errStats(), c={fa:0,cn:0,hit:0,miss:0}; dotsHost.innerHTML="";
+  for(var i=0;i<100;i++){var m=S.mu1+S.se*randn(); var rej=(m>S.hi||m<S.lo); var k;
+    if(S.eff===0) k=rej?"fa":"cn"; else k=rej?"hit":"miss"; c[k]++;
+    var d=document.createElement("div"); d.className="dot "+k; dotsHost.appendChild(d);}
+  document.getElementById("dots4note").innerHTML = S.eff===0
+    ? "<b style='color:var(--bad)'>"+c.fa+" false positives</b> out of 100 studies (you'd expect about "+Math.round(S.alpha*100)+"). "+c.cn+" correctly found nothing."
+    : "<b style='color:var(--good)'>"+c.hit+" caught the effect</b>, <b style='color:var(--amber)'>"+c.miss+" missed it</b> (Type II, false negative). Expected misses: about "+Math.round(S.beta*100)+".";
+});
+
+/* =========== Lookup tables =========== */
+function buildZTable(host,uid,readEl){
+  var h="<table class='lk' id='"+uid+"'><thead><tr><th class='rowh'>z</th>";
+  for(var c=0;c<10;c++) h+="<th data-c='"+c+"'>0.0"+c+"</th>";
+  h+="</tr></thead><tbody>";
+  for(var r=0;r<=34;r++){var zr=r/10; h+="<tr><td class='rowh'>"+zr.toFixed(1)+"</td>";
+    for(var c2=0;c2<10;c2++){var zz=zr+c2/100; h+="<td data-r='"+r+"' data-c='"+c2+"'>"+Phi(zz).toFixed(4).slice(1)+"</td>";}
+    h+="</tr>";}
+  h+="</tbody></table>";
+  host.innerHTML=h; wireTable(host.querySelector("table"),readEl,function(td){
+    var r=+td.getAttribute("data-r"),c=+td.getAttribute("data-c"),z=(r/10+c/100);
+    return "Row <b>"+(r/10).toFixed(1)+"</b> + column <b>0.0"+c+"</b> → z = <b>"+z.toFixed(2)+"</b>. Area to the LEFT = <b>"+td.textContent+"</b>, so area to the right = <b>"+(1-Phi(z)).toFixed(4)+"</b>.";
+  });
+}
+function buildTTable(host,uid,readEl){
+  var h="<table class='lk' id='"+uid+"'><thead><tr><th class='rowh'>df</th>";
+  T_ALPHAS.forEach(function(a,i){h+="<th data-c='"+i+"'>α = "+a.toFixed(2)+"<br><span class='subhead'>one-tail "+(a/2).toFixed(3).replace(/0$/,"")+"</span></th>";});
+  h+="</tr></thead><tbody>";
+  T_ROWS.forEach(function(row,ri){h+="<tr><td class='rowh'>"+(row[0]===Infinity?"∞ (z)":row[0])+"</td>";
+    for(var c=0;c<5;c++) h+="<td data-r='"+ri+"' data-c='"+c+"'>"+row[c+1].toFixed(3)+"</td>";
+    h+="</tr>";});
+  h+="</tbody></table>";
+  host.innerHTML=h; wireTable(host.querySelector("table"),readEl,function(td){
+    var r=T_ROWS[+td.getAttribute("data-r")],c=+td.getAttribute("data-c");
+    return "Row <b>df = "+(r[0]===Infinity?"∞":r[0])+"</b>, column <b>two-tailed α = "+T_ALPHAS[c].toFixed(2)+"</b> → t* = <b>"+td.textContent+"</b>. Reject H₀ if |t| is bigger than this.";
+  });
+}
+function wireTable(tbl,readEl,describe){
+  function cells(td,cls,on){
+    var r=td.getAttribute("data-r"),c=td.getAttribute("data-c");
+    tbl.querySelectorAll("td[data-r='"+r+"'],td[data-c='"+c+"'],th[data-c='"+c+"']").forEach(function(x){x.classList.toggle(cls,on);});
+    var rh=td.parentElement.querySelector(".rowh"); if(rh) rh.classList.toggle(cls,on);
+  }
+  var pinned=null;
+  tbl.addEventListener("mouseover",function(e){var td=e.target.closest("td[data-r]");if(!td) return;tbl.querySelectorAll(".hov").forEach(function(x){x.classList.remove("hov");});td.classList.add("hov");});
+  tbl.addEventListener("mouseleave",function(){tbl.querySelectorAll(".hov").forEach(function(x){x.classList.remove("hov");});});
+  tbl.addEventListener("click",function(e){var td=e.target.closest("td[data-r]");if(!td) return;
+    tbl.querySelectorAll(".xr,.pin").forEach(function(x){x.classList.remove("xr","pin");});
+    if(pinned===td){pinned=null;readEl.innerHTML="Click a cell to read it.";return;}
+    pinned=td; cells(td,"xr",true); td.classList.remove("xr"); td.classList.add("pin"); readEl.innerHTML=describe(td);
+  });
+}
+function tableBlock(host,prefix){
+  host.innerHTML="<div class='tbl-tabs' role='tablist'><button class='btn sel' type='button' data-t='z' id='"+prefix+"TabZ'>Z-table</button><button class='btn' type='button' data-t='t' id='"+prefix+"TabT'>t-table</button></div>"+
+    "<div data-pane='z'><p class='how'><b>Standard normal (Z) table:</b> area to the LEFT of z. Row = first two digits (1.9), column = hundredths (0.06). For a two-tailed p-value: p = 2 × (1 − table value).</p><div class='lk-read' id='"+prefix+"ReadZ'>Click a cell to read it.</div><div class='lk-scroll' id='"+prefix+"Z'></div></div>"+
+    "<div data-pane='t' hidden><p class='how'><b>t critical values:</b> row = df (n − 1), column = two-tailed α. If your df isn't listed, use the next smaller row (the cautious choice). The ∞ row equals the Z cutoffs.</p><div class='lk-read' id='"+prefix+"ReadT'>Click a cell to read it.</div><div class='lk-scroll' id='"+prefix+"T'></div></div>";
+  buildZTable(document.getElementById(prefix+"Z"),prefix+"ZT",document.getElementById(prefix+"ReadZ"));
+  buildTTable(document.getElementById(prefix+"T"),prefix+"TT",document.getElementById(prefix+"ReadT"));
+  host.querySelectorAll(".tbl-tabs button").forEach(function(b){b.addEventListener("click",function(){showPane(host,b.getAttribute("data-t"));});});
+}
+function showPane(host,which){
+  host.querySelectorAll(".tbl-tabs button").forEach(function(x){x.classList.toggle("sel",x.getAttribute("data-t")===which);});
+  host.querySelectorAll("[data-pane]").forEach(function(p){p.hidden=p.getAttribute("data-pane")!==which;});
+}
+var drawer=document.getElementById("drawer"), drawerBody=document.getElementById("drawerBody");
+function openDrawer(which){drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");if(which) showPane(drawerBody,which);document.getElementById("drawerClose").focus();}
+function closeDrawer(){drawer.classList.remove("open");drawer.setAttribute("aria-hidden","true");}
+document.getElementById("fab").addEventListener("click",function(){drawer.classList.contains("open")?closeDrawer():openDrawer();});
+document.getElementById("drawerClose").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",function(e){if(e.key==="Escape") closeDrawer();});
+
+function pinCell(tblId,r,c){
+  var tbl=document.getElementById(tblId); if(!tbl) return;
+  var td=tbl.querySelector("td[data-r='"+r+"'][data-c='"+c+"']"); if(!td) return;
+  if(!td.classList.contains("pin")) td.click();
+  var sc=td.closest(".lk-scroll"); if(sc){ sc.scrollTop=Math.max(0,td.offsetTop-sc.clientHeight/2); }
+}
+
+/* =========== Tab 5: scenarios =========== */
+var BRACKETS=["p > 0.20","0.10 < p < 0.20","0.05 < p < 0.10","0.02 < p < 0.05","0.01 < p < 0.02","p < 0.01"];
+var SC=[
+ {id:"A",title:"ER wait times",table:"z",
+  story:"A hospital administrator knows from years of records that the population standard deviation of patient wait times is <b>σ = 12 minutes</b>. The hospital's target is an average wait of <b>30 minutes</b>. She surveys <b>n = 50</b> patients and finds an average of <b>x̄ = 34 minutes</b>. Is the true average different from 30? Use α = 0.05, two-tailed.",
+  chips:["σ = 12 min","n = 50","x̄ = 34","μ₀ = 30","α = 0.05, two-tailed"],
+  sigmaWhy:"σ = 12 comes from years of hospital records, so it is the population σ.",
+  n:50,xbar:34,mu0:30,spread:12,crit:1.96,se:12/Math.sqrt(50),
+  bonusCI:true},
+ {id:"B",title:"Cholesterol meal plan",table:"t",
+  story:"A nutritionist recruits <b>n = 12</b> participants for a cholesterol-reduction meal plan. After the program, their average reduction is <b>x̄ = 18.4 mg/dL</b> with <b>s = 5.9 mg/dL</b>. The population σ is unknown. Does the plan reduce cholesterol? (H₀: μ = 0, α = 0.05, two-tailed)",
+  chips:["s = 5.9","n = 12","x̄ = 18.4","μ₀ = 0","α = 0.05, two-tailed"],
+  sigmaWhy:"Only s, calculated from these 12 people, is given. σ is unknown.",
+  n:12,xbar:18.4,mu0:0,spread:5.9,df:11,row:11,crit:2.201,se:5.9/Math.sqrt(12)},
+ {id:"C",title:"Trout feed trial",table:"z",
+  story:"A fish hatchery has decades of records: rainbow trout reach an average length of <b>25.0 cm</b> at harvest, with <b>σ = 4.0 cm</b>. They raise <b>n = 36</b> trout on a new feed and get an average of <b>x̄ = 26.1 cm</b>. Did the new feed change length? Use α = 0.05, two-tailed.",
+  chips:["σ = 4.0 cm","n = 36","x̄ = 26.1","μ₀ = 25.0","α = 0.05, two-tailed"],
+  sigmaWhy:"σ = 4.0 comes from decades of hatchery records.",
+  n:36,xbar:26.1,mu0:25,spread:4,crit:1.96,se:4/6},
+ {id:"D",title:"Sparrows by the highway",table:"t",
+  story:"A field ecologist weighs <b>n = 9</b> song sparrows caught near a busy highway. The regional average body mass is <b>20.0 g</b>. Her birds average <b>x̄ = 19.1 g</b> with <b>s = 1.5 g</b>. Are highway sparrows a different weight? Use α = 0.05, two-tailed.",
+  chips:["s = 1.5 g","n = 9","x̄ = 19.1","μ₀ = 20.0","α = 0.05, two-tailed"],
+  sigmaWhy:"She only has s from her 9 birds. The regional mean is known, but not the population σ.",
+  n:9,xbar:19.1,mu0:20,spread:1.5,df:8,row:8,crit:2.306,se:0.5},
+ {id:"E",title:"Blue crab carapace",table:"t",
+  story:"A marine biologist measures carapace width in <b>n = 40</b> blue crabs from a restored marsh. The long-term average for the bay is <b>12.0 cm</b>. Her crabs average <b>x̄ = 12.8 cm</b> with <b>s = 2.1 cm</b>. Are marsh crabs a different size? Use α = 0.05, two-tailed.",
+  chips:["s = 2.1 cm","n = 40","x̄ = 12.8","μ₀ = 12.0","α = 0.05, two-tailed"],
+  sigmaWhy:"n is large, but she only has s from her own crabs. σ is unknown, so t. (With n = 40, t and Z give nearly the same answer.)",
+  n:40,xbar:12.8,mu0:12,spread:2.1,df:39,row:30,crit:2.042,se:2.1/Math.sqrt(40)}
+];
+SC.forEach(function(s){
+  s.stat=(s.xbar-s.mu0)/s.se; s.abs=Math.abs(s.stat); s.reject=s.abs>s.crit;
+  if(s.table==="z"){ s.zr=Math.round(s.abs*100)/100; s.tv=+Phi(s.zr).toFixed(4); s.p=2*(1-s.tv); }
+  else { var row=T_ROWS.filter(function(r){return r[0]===s.row;})[0]; var b=0; for(var c=0;c<5;c++){ if(s.abs>row[c+1]) b=c+1; } s.bracket=b; }
+  s.err=s.reject?"I":"II";
+});
+var scState={cur:0, done:SC.map(function(){return {};})};
+function el(html){var d=document.createElement("div");d.innerHTML=html;return d.firstElementChild;}
+
+function renderScenario(i){
+  var s=SC[i], st=scState.done[i], host=document.getElementById("scPanel");
+  scState.cur=i;
+  document.querySelectorAll("#scTabs .tab").forEach(function(t,j){t.setAttribute("aria-selected",j===i?"true":"false");});
+  var isZ=s.table==="z", L=isZ?"z":"t", sym=isZ?"σ":"s";
+  var h="<div class='story'><b>Scenario "+s.id+": "+s.title+".</b> "+s.story+"<div class='chips'>"+s.chips.map(function(c){return "<span class='chip'>"+c+"</span>";}).join("")+"</div></div>";
+  h+="<div class='mode-bar'><button class='btn' type='button' id='scExample'>Show a completed example instead</button><button class='btn' type='button' id='scClear'>Clear my answers</button></div>";
+  h+="<div class='example-banner' id='scBanner' hidden>Showing the fully worked answers. Click \"Clear my answers\" to try it yourself.</div>";
+  // step 1
+  h+="<div class='step' data-step='1'><div class='step-h'><span class='step-n'>Step 1</span>Which table?</div><p>Is the population σ given, or only a sample s?</p><div class='answer-row'><button class='btn' type='button' data-tbl='z'>Z-table</button><button class='btn' type='button' data-tbl='t'>t-table</button></div><div class='fb' id='f1' hidden></div></div>";
+  // step 2
+  if(isZ) h+="<div class='step' data-step='2'><div class='step-h'><span class='step-n'>Step 2</span>Degrees of freedom</div><p>The Z-table has no degrees of freedom. Everyone uses the same table, so skip ahead.</p></div>";
+  else {
+    h+="<div class='step' data-step='2'><div class='step-h'><span class='step-n'>Step 2</span>Degrees of freedom</div><div class='formula'>df = n − 1</div><div class='answer-row'><label for='q_df'>df =</label><input type='number' id='q_df' step='1'><span class='status' id='st_df'></span></div>";
+    if(s.row!==s.df) h+="<div class='answer-row'><label for='q_row'>Row you'll use in the t-table (your df isn't listed) =</label><input type='number' id='q_row' step='1'><span class='status' id='st_row'></span></div>";
+    h+="</div>";
+  }
+  // step 3
+  var hint=isZ?"For α = 0.05 two-tailed, 2.5% goes in each tail. Search the <b>body</b> of the Z-table for <b>0.9750</b>, then read its row + column.":"Go to the t-table, row df = "+(s.row!==s.df?"(the row you chose)":"your df")+", column <b>α = 0.05</b> (two-tailed).";
+  h+="<div class='step' data-step='3'><div class='step-h'><span class='step-n'>Step 3</span>Look up the critical value "+L+"*</div><p>"+hint+" <button class='linkbtn' type='button' data-open='"+s.table+"'>Open the "+(isZ?"Z":"t")+"-table</button></p><div class='answer-row'><label for='q_crit'>"+L+"* =</label><input type='number' id='q_crit' step='any'><span class='status' id='st_crit'></span></div></div>";
+  // step 4
+  h+="<div class='step' data-step='4'><div class='step-h'><span class='step-n'>Step 4</span>Test statistic: how many standard errors away?</div><p>test statistic = (Observed − Expected) / Standard error</p><div class='formula'>SE = "+sym+" / √n &nbsp;&nbsp; "+L+" = (x̄ − μ₀) / SE</div>"+
+     "<div class='answer-row'><label for='q_se'>SE =</label><input type='number' id='q_se' step='any'><span class='status' id='st_se'></span></div>"+
+     "<div class='answer-row'><label for='q_stat'>"+L+" =</label><input type='number' id='q_stat' step='any'><span class='status' id='st_stat'></span></div><p class='hintline'>Round SE to 3–4 decimals and "+L+" to 2 decimals.</p></div>";
+  // step 5
+  h+="<div class='step' data-step='5'><div class='step-h'><span class='step-n'>Step 5</span>Compare and decide</div><p>Is |"+L+"| bigger than "+L+"*?</p><div class='answer-row'><button class='btn' type='button' data-dec='rej'>Yes → Reject H₀</button><button class='btn' type='button' data-dec='fail'>No → Fail to reject H₀</button></div><div class='fb' id='f5' hidden></div></div>";
+  // step 6
+  if(isZ){
+    h+="<div class='step' data-step='6'><div class='step-h'><span class='step-n'>Step 6</span>Find the p-value with the Z-table</div><p>Round |z| to 2 decimals and look it up (row + column). The table gives the area to the left. <button class='linkbtn' type='button' data-open='z'>Open the Z-table</button></p><div class='formula'>p (two-tailed) = 2 × (1 − table value)</div>"+
+       "<div class='answer-row'><label for='q_tv'>Table value =</label><input type='number' id='q_tv' step='any'><span class='status' id='st_tv'></span></div>"+
+       "<div class='answer-row'><label for='q_p'>p =</label><input type='number' id='q_p' step='any'><span class='status' id='st_p'></span></div><div class='fb' id='f6' hidden></div></div>";
+  } else {
+    h+="<div class='step' data-step='6'><div class='step-h'><span class='step-n'>Step 6</span>Estimate the p-value with the t-table</div><p>The t-table can't give an exact p, but it can trap it. In your df row, find the two values |t| falls between, then read their α column headings. <button class='linkbtn' type='button' data-open='t'>Open the t-table</button></p>"+
+       "<div class='answer-row'><label for='q_br'>The p-value is</label><select id='q_br'><option value=''>choose…</option>"+BRACKETS.map(function(b,k){return "<option value='"+k+"'>"+b+"</option>";}).join("")+"</select><span class='status' id='st_br'></span></div><div class='fb' id='f6' hidden></div></div>";
+  }
+  // step 7
+  h+="<div class='step' data-step='7'><div class='step-h'><span class='step-n'>Step 7</span>Which mistake could you be making?</div><p>No test is certain. Based on your decision in Step 5, which error is possible here?</p><div class='answer-row'><button class='btn' type='button' data-err='I'>Type I (false alarm)</button><button class='btn' type='button' data-err='II'>Type II (missed effect)</button></div><div class='fb' id='f7' hidden></div></div>";
+  if(s.bonusCI){
+    h+="<div class='step' data-step='8'><div class='step-h'><span class='step-n'>Bonus</span>95% confidence interval</div><div class='formula'>x̄ ± z* × SE</div>"+
+       "<div class='answer-row'><label for='q_lo'>Lower =</label><input type='number' id='q_lo' step='any'><span class='status' id='st_lo'></span></div>"+
+       "<div class='answer-row'><label for='q_hi'>Upper =</label><input type='number' id='q_hi' step='any'><span class='status' id='st_hi'></span></div><div class='fb' id='f8' hidden></div></div>";
+  }
+  host.innerHTML=h;
+
+  var ci = s.bonusCI ? {lo:s.xbar-s.crit*s.se, hi:s.xbar+s.crit*s.se} : null;
+  var checks={df:[s.df,0.01],row:[s.row,0.01],crit:[s.crit,0.006],se:[s.se,0.006],stat:[s.stat,0.021],tv:[s.tv,0.00015],p:[s.p,0.0021]};
+  if(ci){checks.lo=[ci.lo,0.03];checks.hi=[ci.hi,0.03];}
+  function stepDone(n,ok){var e=host.querySelector(".step[data-step='"+n+"']"); if(e) e.classList.toggle("complete",!!ok);}
+  function markStatus(key){
+    var inp=document.getElementById("q_"+key), stEl=document.getElementById("st_"+key); if(!inp) return null;
+    var v=parseFloat(inp.value); st[key]=inp.value;
+    if(inp.value===""||isNaN(v)){stEl.textContent="";stEl.className="status";return null;}
+    var ok=Math.abs(v-checks[key][0])<=checks[key][1];
+    stEl.textContent=ok?"✓ correct":"not quite"; stEl.className="status "+(ok?"ok":"bad");
+    if(!ok && key==="crit" && Math.abs(v-1.96)<0.006 && !isZ) stEl.textContent="that's the Z cutoff; use the t-table row";
+    if(!ok && key==="stat" && Math.abs(Math.abs(v)-s.abs)<0.021) stEl.textContent="check the sign (x̄ − μ₀)";
+    if(!ok && key==="p" && Math.abs(v-(1-s.tv))<0.0021) stEl.textContent="two-tailed: multiply by 2";
+    return ok;
+  }
+  function refreshSteps(){
+    if(!isZ){var a=markStatus("df"),b=s.row!==s.df?markStatus("row"):true; stepDone(2,a&&b);} else stepDone(2,true);
+    stepDone(3,markStatus("crit"));
+    var se=markStatus("se"),stt=markStatus("stat"); stepDone(4,se&&stt);
+    if(isZ){var tv=markStatus("tv"),pp=markStatus("p"); stepDone(6,tv&&pp);
+      var f6=document.getElementById("f6"); if(tv&&pp){f6.hidden=false;f6.className="fb ok";f6.innerHTML="In plain words: if "+(s.id==="A"?"the true average wait were really 30 minutes":"the new feed did nothing")+", only about <b>"+(s.p*100).toFixed(1)+" in 100</b> samples like this would land this far from μ₀ by luck. "+(s.p<0.05?"That's below 5 in 100, which agrees with rejecting H₀.":"That's more than 5 in 100, which agrees with failing to reject H₀.");} else f6.hidden=true;}
+    if(ci){var lo=markStatus("lo"),hi=markStatus("hi"); stepDone(8,lo&&hi); var f8=document.getElementById("f8"); if(lo&&hi){f8.hidden=false;f8.className="fb ok";f8.innerHTML="The interval "+ci.lo.toFixed(2)+" to "+ci.hi.toFixed(2)+" minutes does <b>not</b> include 30. That matches the test: 30 minutes is not a believable value for the true average.";} else f8.hidden=true;}
+    updateTabs();
+  }
+  Object.keys(checks).forEach(function(k){var inp=document.getElementById("q_"+k); if(!inp) return; if(st[k]!==undefined) inp.value=st[k];
+    inp.addEventListener("change",refreshSteps); inp.addEventListener("input",function(){var v=parseFloat(inp.value); if(!isNaN(v)&&Math.abs(v-checks[k][0])<=checks[k][1]) refreshSteps(); else {var e=document.getElementById("st_"+k); e.textContent=""; e.className="status";}});});
+
+  // step 1 buttons
+  function doTable(v){
+    st.tbl=v; host.querySelectorAll("[data-tbl]").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-tbl")===v);});
+    var ok=v===s.table, f=document.getElementById("f1"); f.hidden=false; f.className="fb "+(ok?"ok":"no");
+    f.innerHTML=(ok?"Correct. ":"Not quite. ")+s.sigmaWhy+(ok?" Use the "+(isZ?"Z":"t")+"-table.":""); stepDone(1,ok); updateTabs();
+  }
+  host.querySelectorAll("[data-tbl]").forEach(function(b){b.addEventListener("click",function(){doTable(b.getAttribute("data-tbl"));});});
+  function doDec(v){
+    st.dec=v; host.querySelectorAll("[data-dec]").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-dec")===v);});
+    var ok=(v==="rej")===s.reject, f=document.getElementById("f5"); f.hidden=false; f.className="fb "+(ok?"ok":"no");
+    var cmp="|"+L+"| = "+s.abs.toFixed(2)+(s.reject?" is bigger than ":" is smaller than ")+L+"* = "+s.crit.toFixed(3)+". ";
+    var plain={A:"The average wait is different from the 30-minute target, more than luck would explain.",B:"The meal plan's reduction is far too large to be luck. The plan appears to lower cholesterol.",C:"A 1.1 cm difference could easily be luck in which fish were measured. We can't say the feed changed length.",D:"A 0.9 g difference with only 9 birds could easily be luck. We can't say highway sparrows differ.",E:"The marsh crabs are larger than the bay average by more than luck would explain."}[s.id];
+    f.innerHTML=(ok?"Correct. ":"Look again. ")+cmp+(ok?plain:""); stepDone(5,ok); updateTabs();
+  }
+  host.querySelectorAll("[data-dec]").forEach(function(b){b.addEventListener("click",function(){doDec(b.getAttribute("data-dec"));});});
+  function doBr(v){
+    var sel=document.getElementById("q_br"); if(!sel) return; sel.value=v; st.br=v; var stEl=document.getElementById("st_br"), f=document.getElementById("f6");
+    if(v===""){stEl.textContent="";f.hidden=true;stepDone(6,false);return;}
+    var ok=+v===s.bracket; stEl.textContent=ok?"✓ correct":"not quite"; stEl.className="status "+(ok?"ok":"bad");
+    var row=T_ROWS.filter(function(r){return r[0]===s.row;})[0];
+    if(ok){f.hidden=false;f.className="fb ok";
+      var lowV=s.bracket>0?row[s.bracket]:null, hiV=s.bracket<5?row[s.bracket+1]:null;
+      f.innerHTML="In row df = "+s.row+", |t| = "+s.abs.toFixed(2)+(lowV?" is past "+lowV.toFixed(3)+" (α = "+T_ALPHAS[s.bracket-1].toFixed(2)+")":"")+(lowV&&hiV?" but":"")+(hiV?" is not past "+hiV.toFixed(3)+" (α = "+T_ALPHAS[s.bracket].toFixed(2)+")":"")+". So "+BRACKETS[s.bracket]+". "+(s.bracket>=3?"That's below 0.05, which matches rejecting H₀.":"That's above 0.05, which matches failing to reject H₀.");
+    } else f.hidden=true;
+    stepDone(6,ok); updateTabs();
+  }
+  var brSel=document.getElementById("q_br"); if(brSel) brSel.addEventListener("change",function(){doBr(brSel.value);});
+  function doErr(v){
+    st.err=v; host.querySelectorAll("[data-err]").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-err")===v);});
+    var ok=v===s.err, f=document.getElementById("f7"); f.hidden=false; f.className="fb "+(ok?"ok":"no");
+    var why={A:"You rejected H₀, so the only possible mistake is a false alarm: claiming the average wait differs from 30 minutes when it really doesn't.",B:"You rejected H₀, so the possible mistake is a false alarm: concluding the meal plan works when the reduction was really luck. (With t this large, that's very unlikely.)",C:"You failed to reject H₀, so you can't have made a false alarm. The risk is a miss: the feed really does change length, but 36 fish weren't enough to show it.",D:"You failed to reject H₀, so the risk is a miss: highway sparrows really are lighter, but 9 birds weren't enough to detect it.",E:"You rejected H₀, so the possible mistake is a false alarm: the marsh crabs aren't really larger, and this sample was unusually big by luck."}[s.id];
+    f.innerHTML=(ok?"Correct. ":"Think about it this way: a Type I error needs you to reject, a Type II error needs you to fail to reject. ")+(ok?why:""); stepDone(7,ok); updateTabs();
+  }
+  host.querySelectorAll("[data-err]").forEach(function(b){b.addEventListener("click",function(){doErr(b.getAttribute("data-err"));});});
+  host.querySelectorAll("[data-open]").forEach(function(b){b.addEventListener("click",function(){openDrawer(b.getAttribute("data-open"));});});
+
+  // restore
+  if(st.tbl) doTable(st.tbl); if(st.dec) doDec(st.dec); if(st.br!==undefined && st.br!=="") doBr(st.br); if(st.err) doErr(st.err);
+  refreshSteps();
+
+  document.getElementById("scExample").addEventListener("click",function(){
+    var r=function(x,d){return (Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toString();};
+    st.df=s.df!==undefined?String(s.df):undefined; st.row=s.row!==undefined?String(s.row):undefined;
+    st.crit=String(s.crit); st.se=r(s.se,4); st.stat=r(s.stat,2);
+    if(isZ){st.tv=s.tv.toFixed(4); st.p=r(s.p,4);} else st.br=String(s.bracket);
+    if(ci){st.lo=r(ci.lo,2); st.hi=r(ci.hi,2);}
+    st.tbl=s.table; st.dec=s.reject?"rej":"fail"; st.err=s.err; st.example=true;
+    renderScenario(i); document.getElementById("scBanner").hidden=false;
+  });
+  document.getElementById("scClear").addEventListener("click",function(){scState.done[i]={}; renderScenario(i);});
+  if(st.example) document.getElementById("scBanner").hidden=false;
+}
+function updateTabs(){
+  document.querySelectorAll("#scTabs .tab").forEach(function(t,j){
+    var total=SC[j].bonusCI?8:7;
+    var mark=t.querySelector(".done");
+    if(j===scState.cur){ var n=document.querySelectorAll("#scPanel .step.complete").length; SC[j]._complete=n>=total; }
+    mark.textContent=SC[j]._complete?"✓":"";
+  });
+}
+function buildTabs(){
+  var host=document.getElementById("scTabs");
+  SC.forEach(function(s,i){
+    var b=document.createElement("button"); b.type="button"; b.className="tab"; b.setAttribute("role","tab"); b.id="tab"+s.id;
+    b.innerHTML=s.id+". "+s.title+" <span class='done'></span>";
+    b.addEventListener("click",function(){renderScenario(i);});
+    host.appendChild(b);
+  });
+}
+
+
+/* ---------- init ---------- */
+draw1(); draw1b(); draw2(); buildSort(); draw3(); draw4(); emptyDots();
+tableBlock(drawerBody,"dr"); tableBlock(document.getElementById("inlineTables"),"in");
+buildTabs(); renderScenario(0);
+var h=(location.hash||"").replace("#","");
+showTab(TABS.indexOf(h)>=0?h:"normal",false);
+})();
+</script>
+</body></html>
