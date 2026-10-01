@@ -32,19 +32,8 @@ The page has six tabs, meant to be worked through in order. Tabs 1–4 each end 
 | `index.html` | The entire app: HTML, styles and code in one file, with no other dependencies. |
 | `README.md` | This file. |
 
-The Canvas questions and answer key (`Usual_or_Unusual_Canvas_Questions.docx`) belong in Canvas, not in this repository, so students can't see the key.
+The associated questions document (`Usual_or_Unusual_Canvas_Questions.docx`) is a resource for instructors wanting to have further engagment at the end of each section.
 
-## Updating the site
-
-1. In the repository, click `index.html`, then the pencil (edit) icon.
-2. Select all, paste in the new version, and click **Commit changes**.
-3. The live site updates within about a minute. You don't need to change the Pages settings again.
-
-## First-time setup (GitHub Pages)
-
-1. Create a new public repository (this one is `z-t-p`) and upload `index.html` and `README.md`.
-2. Go to **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, and click **Save**.
-3. After about a minute, refresh that page to see the live link.
 
 ## Notes on the statistics
 
