@@ -9,7 +9,7 @@
     --navy:#1F4E79; --navy-dim:#33648f;
     --tcol:#1F4E79; --tfill:#DCEBF6;
     --zcol:#4F9E6E; --zfill:#E1F1E5;
-    --amber:#C9822E; --amber-fill:#F4E1C4;
+    --amber:#D86F1A; --amber-fill:#F4E1C4;
     --good:#3C8A5B; --good-fill:#E3F3E9;
     --bad:#B24242; --bad-fill:#F7E4E4;
     --concept:#FBF7EE;
@@ -26,7 +26,7 @@
       --navy:#8FC0EA; --navy-dim:#6FA6D6;
       --tcol:#8FC0EA; --tfill:#213241;
       --zcol:#79C99A; --zfill:#1F3327;
-      --amber:#E0A050; --amber-fill:#3A2E1A;
+      --amber:#F08A3C; --amber-fill:#3A2E1A;
       --good:#7FCE9E; --good-fill:#1E3327;
       --bad:#E08080; --bad-fill:#3A2323;
       --concept:#26211a;
@@ -39,7 +39,7 @@
     --navy:#8FC0EA; --navy-dim:#6FA6D6;
     --tcol:#8FC0EA; --tfill:#213241;
     --zcol:#79C99A; --zfill:#1F3327;
-    --amber:#E0A050; --amber-fill:#3A2E1A;
+    --amber:#F08A3C; --amber-fill:#3A2E1A;
     --good:#7FCE9E; --good-fill:#1E3327;
     --bad:#E08080; --bad-fill:#3A2323;
     --concept:#26211a;
@@ -182,7 +182,16 @@
 
   .dots{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;margin-top:12px;max-width:520px;}
   .dot{aspect-ratio:1;border-radius:50%;background:var(--line);max-width:100%;}
-  .dot.fa{background:var(--bad);} .dot.miss{background:var(--amber);} .dot.hit{background:var(--good);} .dot.cn{background:color-mix(in srgb, var(--muted) 45%, var(--panel));}
+  .dot.fa{background:repeating-linear-gradient(45deg,var(--bad) 0 3px,var(--panel) 3px 5.5px);box-shadow:inset 0 0 0 2px var(--bad);}
+  .dot.miss{background:var(--panel);box-shadow:inset 0 0 0 4px var(--amber);}
+  .dot.hit{background:var(--good);}
+  .dot.cn{background:color-mix(in srgb, var(--muted) 45%, var(--panel));}
+  .dotkey{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;font-size:13px;color:var(--muted);}
+  .dotkey span{display:inline-flex;align-items:center;gap:6px;}
+  .dotkey .dot{width:16px;height:16px;flex:none;}
+  .sw.pat1{background:repeating-linear-gradient(45deg,var(--bad) 0 3px,var(--panel) 3px 5px);box-shadow:inset 0 0 0 1px var(--bad);}
+  .sw.pat2{background-color:var(--amber);background-image:radial-gradient(circle,var(--panel) 1.1px,transparent 1.4px);background-size:5px 5px;}
+  .swatch-in{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;}
 
   /* scenarios */
   .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
@@ -214,8 +223,9 @@
   .tbl-tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
   table.lk{border-collapse:collapse;font-size:12.5px;font-family:var(--f-mono);font-variant-numeric:tabular-nums;width:100%;}
   table.lk th,table.lk td{border:1px solid var(--line);padding:4px 5px;text-align:center;cursor:pointer;}
+  table.lk caption{caption-side:top;text-align:left;font-family:var(--f-body);font-size:12px;color:var(--muted);padding:0 0 6px;}
   table.lk th{font-family:var(--f-body);font-weight:700;color:var(--navy);background:var(--paper);position:sticky;top:0;z-index:1;}
-  table.lk th.rowh{position:static;}
+
   table.lk td.rowh,table.lk th.rowh{font-weight:700;color:var(--navy);background:var(--paper);}
   table.lk .xr{background:color-mix(in srgb, var(--amber-fill) 55%, transparent);}
   table.lk .pin{background:var(--amber);color:var(--panel);font-weight:700;}
@@ -232,7 +242,9 @@
   @media (prefers-reduced-motion: reduce){.drawer{transition:none;}}
   .drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
   .drawer-head h3{font-family:var(--f-display);color:var(--navy);font-size:20px;margin:0;}
-  .drawer .lk-scroll{max-height:none;flex:1;}
+  [hidden]{display:none!important;}
+  .drawer [data-pane]{display:flex;flex-direction:column;flex:1;min-height:0;}
+  .drawer .lk-scroll{max-height:none;flex:1;min-height:0;overflow:auto;}
   .drawer-body{display:flex;flex-direction:column;flex:1;min-height:0;}
 
   .theme-toggle{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;font-family:var(--f-body);color:var(--muted);cursor:pointer;z-index:15;}
@@ -334,6 +346,10 @@
 
     <div class="panel" style="margin-top:16px;">
       <h3>Turn any tree into a z-score, then a probability</h3>
+      <div class="explain-grid two" style="margin-bottom:12px;">
+        <div class="explain-card"><div class="tag">The z-score formula</div><p style="font-family:var(--f-mono);font-size:17px;margin-bottom:6px;">z = (x − μ) / σ</p><p>x = your value, μ = the mean, σ = the standard deviation. Subtract the mean, then divide by the SD. The answer is how many SDs your value is above (+) or below (−) average.</p></div>
+        <div class="explain-card"><div class="tag">Why convert to z-scores?</div><p><b>One table for everything.</b> Trees in meters, fish in cm, mice in grams: once each value is a z-score, the same Z-table gives the probability.</p><p style="margin-top:6px;"><b>Compare different scales.</b> Leaf size (cm) and seed weight (g) can't be compared directly, but their z-scores show which value is more unusual.</p></div>
+      </div>
       <p class="note" style="margin-top:0;">A z-score says how many standard deviations a value is from the mean. Once you have z, one table (the Z-table, also called Phi or Φ) gives the probability.</p>
       <div class="controls">
         <div class="field"><label for="x1">Tree height (x, meters)</label><div class="slider-row"><input type="range" id="x1" min="7" max="23" step="0.1" value="20"><output id="x1o" class="num">20.0</output></div></div>
@@ -507,9 +523,9 @@
         <div class="hd" role="columnheader">Reject H₀<br><small>Alarm goes off</small></div>
         <div class="rh" role="rowheader">H₀ is true<small>No real effect (no fire)</small></div>
         <div class="okc"><b>Correct conclusion</b>Nothing happening, and you said so.</div>
-        <div class="e1"><b>Type I error · false positive</b>A fire alarm going off when there is no fire. You claim an effect that isn't real.<small>Chance = α (you choose it)</small></div>
+        <div class="e1"><b><span class="swatch-in sw pat1"></span>Type I error · false positive</b>A fire alarm going off when there is no fire. You claim an effect that isn't real.<small>Chance = α (you choose it)</small></div>
         <div class="rh" role="rowheader">H₀ is false<small>Real effect (real fire)</small></div>
-        <div class="e2"><b>Type II error · false negative</b>Ignoring the smoke and missing a real fire. A real effect goes undetected.<small>Chance = β</small></div>
+        <div class="e2"><b><span class="swatch-in sw pat2"></span>Type II error · false negative</b>Ignoring the smoke and missing a real fire. A real effect goes undetected.<small>Chance = β</small></div>
         <div class="okc"><b>Correct conclusion · power</b>You caught a real effect.<small>Chance = 1 − β</small></div>
       </div>
       <p class="note">Memory trick: Type <b>I</b> = "I see something that isn't there." Type <b>II</b> = "I'm too blind to see what IS there."</p>
@@ -525,9 +541,11 @@
       </div>
       <svg id="c4" viewBox="0 0 680 270" role="img" aria-label="Null and real-effect curves with Type I and Type II error areas"></svg>
       <div class="legend">
-        <span><span class="sw" style="background:var(--bad);"></span>Type I (false positive) area</span>
-        <span><span class="sw" style="background:var(--amber);"></span>Type II (false negative) area</span>
-        <span><span class="sw" style="background:var(--good-fill);border:1px solid var(--good);"></span>Power (caught it)</span>
+        <span><span class="sw" style="background:var(--zcol);height:3px;"></span>Green curve: no effect (H₀ true)</span>
+        <span><span class="sw" style="background:var(--tcol);height:3px;"></span>Blue curve: real effect</span>
+        <span><span class="sw pat1" style="height:12px;"></span>Red stripes: Type I (false positive)</span>
+        <span><span class="sw pat2" style="height:12px;"></span>Orange dotted: Type II (false negative)</span>
+        <span><span class="sw" style="background:var(--good-fill);border:1px solid var(--good);height:12px;"></span>Light green: power (caught it)</span>
       </div>
       <div class="stat-row">
         <div class="stat bad"><span class="k">Type I chance (α)</span><span class="v" id="s4a">–</span></div>
@@ -536,8 +554,32 @@
       </div>
       <div class="sentence" id="s4sent"></div>
 
+      <h3 style="margin-top:22px;">What these curves are showing</h3>
+      <p class="note" style="margin-top:0;">Imagine running this tomato study over and over. Each time you'd get a slightly different average height just by luck. Each curve shows where those averages would land.</p>
+      <div class="decoder">
+        <div><b style="color:var(--zcol)">The green curve: the "no effect" world.</b> All the averages you'd get if the fertilizer truly does nothing (H₀ is true). They pile up around 50 cm.</div>
+        <div><b>The blue curve: the "real effect" world.</b> All the averages you'd get if the fertilizer truly adds height. They pile up around 50 cm plus the effect.</div>
+        <div><b>The dashed lines: your cutoffs.</b> Set by α. An average landing <i>past</i> a dashed line is called "significant" (reject H₀). An average landing <i>between</i> them is called "could be luck" (fail to reject).</div>
+        <div><b style="color:var(--bad)"><span class="swatch-in sw pat1"></span>Red stripes: false positives (Type I).</b> The part of the <i>green</i> curve past the cutoffs. The fertilizer did nothing, but by luck the average landed far enough out to look significant. Its size is α.</div>
+        <div><b style="color:var(--amber)"><span class="swatch-in sw pat2"></span>Orange dotted: false negatives (Type II).</b> The part of the <i>blue</i> curve between the cutoffs. The fertilizer really works, but by luck the average landed close enough to 50 cm to look like nothing happened. Its size is β.</div>
+        <div><b style="color:var(--good)">Light green: power.</b> The part of the <i>blue</i> curve past the cutoff. The fertilizer works and the study caught it. The less the two curves overlap, the more power you have.</div>
+      </div>
+      <div class="callout"><b>Three things change the overlap.</b> More plants (bigger n) make both curves narrower, so they overlap less: less orange. A bigger true effect pushes the blue curve farther away: less orange. A smaller α moves the dashed lines outward: less red, but more orange.</div>
+
       <h3 style="margin-top:22px;">Run 100 studies</h3>
-      <p class="note" style="margin-top:0;">Each dot is one complete study using the settings above. Gray = correctly found nothing. Red = false positive. Green = caught a real effect. Amber = false negative.</p>
+      <p class="note" style="margin-top:0;">Each dot is one complete study using the settings above. The dot shows how that study turned out.</p>
+      <div class="dotkey" aria-label="Dot key">
+        <span><span class="dot cn"></span>Gray solid: correctly found nothing</span>
+        <span><span class="dot fa"></span>Red striped: false positive (Type I)</span>
+        <span><span class="dot hit"></span>Green solid: caught a real effect</span>
+        <span><span class="dot miss"></span>Orange ring: false negative (Type II)</span>
+      </div>
+      <div class="mode-bar" style="margin-top:0;">
+        <span class="hintline">Quick settings:</span>
+        <button class="btn" type="button" id="preset0">No real effect (0 cm)</button>
+        <button class="btn" type="button" id="preset3">Real effect (3 cm)</button>
+        <span class="hintline" id="effNow">True effect is now: <b>3.0 cm</b></span>
+      </div>
       <button class="cta" id="run4" type="button">&#9654; Run 100 studies</button>
       <div class="dots" id="dots4" aria-live="polite"></div>
       <div class="note" id="dots4note"></div>
@@ -545,8 +587,12 @@
     <div class="callout"><b>The trade-off.</b> Lowering α (your threshold) from 0.05 to 0.01 reduces false positives but raises false negatives. Use the stricter α = 0.01 when a false positive is costly, such as approving a dangerous drug or diagnosing a fatal disease.</div>
     <p class="tryit-h">Try this</p>
     <ol class="tryit">
-      <li>Set the true effect to 0 (the fertilizer does nothing). Click "Run 100 studies" three times and count the red dots (false positives) each time.</li>
-      <li>Set the effect to 3 cm and n to 8, then run 100 studies. Now raise n to 40 and run again. Did you get more or fewer amber dots (false negatives)?</li>
+      <li><b>On the curves:</b> Click "Real effect (3 cm)" and set n = 16, α = 0.05. Find the green curve, the blue curve, the red striped area, and the orange dotted area. Read the Type II chance (β) and power.</li>
+      <li><b>On the curves:</b> Slide n from 4 up to 60. Watch both curves get narrower, the overlap shrink, and the orange dotted area (false negatives) get smaller. What happens to power?</li>
+      <li><b>On the curves:</b> Put n back to 16. Slide the true effect from 0 up to 8 cm. When the effect is 0, the blue curve disappears. Why can't a false negative happen then?</li>
+      <li><b>On the curves:</b> Change α from 0.05 to 0.01. Watch the dashed cutoffs move outward. Which area shrinks, and which grows?</li>
+      <li><b>With the dots:</b> Click "No real effect (0 cm)." Check that it says "True effect is now: 0.0 cm." Click "Run 100 studies" three times and count the <b>red striped</b> dots (false positives) each time. The rest should be gray.</li>
+      <li><b>With the dots:</b> Click "Real effect (3 cm)" and set n to 8, then run 100 studies. Now the dots are green and orange rings. Raise n to 40 and run again. Did you get more or fewer <b>orange rings</b> (false negatives)?</li>
     </ol>
     <div class="next-row"><button class="btn" type="button" data-go="pvalue">← Back: p-value</button><button class="cta" type="button" data-go="scen">Next: Scenarios →</button></div>
   </section>
@@ -880,15 +926,20 @@ function errStats(){
 }
 function draw4(){
   var S=errStats();
-  document.getElementById("eff4o").textContent=S.eff.toFixed(1); document.getElementById("n4o").textContent=S.n;
+  document.getElementById("eff4o").textContent=S.eff.toFixed(1); var en=document.getElementById("effNow"); if(en) en.innerHTML="True effect is now: <b>"+S.eff.toFixed(1)+" cm</b>"+(S.eff===0?" (no real effect: expect gray solid and red striped dots)":" (real effect: expect green solid dots and orange rings)"); document.getElementById("n4o").textContent=S.n;
   var f0=function(x){return npdf((x-50)/S.se)/S.se;}, f1=function(x){return npdf((x-S.mu1)/S.se)/S.se;};
   P4.clear();
+  var defs=P4.add("defs",{});
+  var p1=mk("pattern",{id:"patT1",width:6,height:6,patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"});
+  p1.appendChild(mk("rect",{width:6,height:6,fill:"var(--panel)"})); p1.appendChild(mk("rect",{width:3.4,height:6,fill:"var(--bad)"})); defs.appendChild(p1);
+  var p2=mk("pattern",{id:"patT2",width:6,height:6,patternUnits:"userSpaceOnUse"});
+  p2.appendChild(mk("rect",{width:6,height:6,fill:"var(--amber)"})); p2.appendChild(mk("circle",{cx:3,cy:3,r:1.2,fill:"var(--panel)"})); defs.appendChild(p2);
   if(S.eff>0){
-    P4.area(f1,S.hi,64,{fill:"var(--good-fill)",stroke:"none"},120);
-    P4.area(f1,S.lo,S.hi,{fill:"var(--amber)",opacity:0.65},120);
+    P4.area(f1,S.hi,64,{fill:"var(--good-fill)",stroke:"var(--good)","stroke-width":0.6},120);
+    P4.area(f1,S.lo,S.hi,{fill:"url(#patT2)",stroke:"var(--amber)","stroke-width":0.8},120);
   }
-  P4.area(f0,S.hi,64,{fill:"var(--bad)",opacity:0.85});
-  P4.area(f0,40,S.lo,{fill:"var(--bad)",opacity:0.85});
+  P4.area(f0,S.hi,64,{fill:"url(#patT1)",stroke:"var(--bad)","stroke-width":0.8});
+  P4.area(f0,40,S.lo,{fill:"url(#patT1)",stroke:"var(--bad)","stroke-width":0.8});
   P4.axis([40,44,48,52,56,60,64]);
   P4.text(P4.x(64),P4.y(0)+30,"cm",{"text-anchor":"end","font-size":"10"});
   P4.curve(f0,{stroke:"var(--zcol)","stroke-width":2.2},260);
@@ -908,23 +959,26 @@ function draw4(){
 [eff4,n4].forEach(function(e){e.addEventListener("input",draw4);}); a4.addEventListener("change",draw4);
 var dotsHost=document.getElementById("dots4");
 function emptyDots(){dotsHost.innerHTML="";for(var i=0;i<100;i++){var d=document.createElement("div");d.className="dot";dotsHost.appendChild(d);}}
+function setEff(v){eff4.value=v; draw4(); dotsHost.innerHTML=""; for(var i=0;i<100;i++){var d=document.createElement("div");d.className="dot";dotsHost.appendChild(d);} document.getElementById("dots4note").textContent="";}
+document.getElementById("preset0").addEventListener("click",function(){setEff(0);});
+document.getElementById("preset3").addEventListener("click",function(){setEff(3);});
 document.getElementById("run4").addEventListener("click",function(){
   var S=errStats(), c={fa:0,cn:0,hit:0,miss:0}; dotsHost.innerHTML="";
   for(var i=0;i<100;i++){var m=S.mu1+S.se*randn(); var rej=(m>S.hi||m<S.lo); var k;
     if(S.eff===0) k=rej?"fa":"cn"; else k=rej?"hit":"miss"; c[k]++;
     var d=document.createElement("div"); d.className="dot "+k; dotsHost.appendChild(d);}
   document.getElementById("dots4note").innerHTML = S.eff===0
-    ? "<b style='color:var(--bad)'>"+c.fa+" false positives</b> out of 100 studies (you'd expect about "+Math.round(S.alpha*100)+"). "+c.cn+" correctly found nothing."
-    : "<b style='color:var(--good)'>"+c.hit+" caught the effect</b>, <b style='color:var(--amber)'>"+c.miss+" missed it</b> (Type II, false negative). Expected misses: about "+Math.round(S.beta*100)+".";
+    ? "<b style='color:var(--bad)'>"+c.fa+" false positives</b> (red striped) out of 100 studies (you'd expect about "+Math.round(S.alpha*100)+"). "+c.cn+" correctly found nothing."
+    : "<b style='color:var(--good)'>"+c.hit+" caught the effect</b>, <b style='color:var(--amber)'>"+c.miss+" missed it</b> (orange rings: Type II, false negative). Expected misses: about "+Math.round(S.beta*100)+". <br>No red striped dots? That's expected: a false positive can only happen when there is <b>no</b> real effect. Click \"No real effect (0 cm)\" to see them.";
 });
 
 /* =========== Lookup tables =========== */
 function buildZTable(host,uid,readEl){
-  var h="<table class='lk' id='"+uid+"'><thead><tr><th class='rowh'>z</th>";
+  var h="<table class='lk' id='"+uid+"'><caption>Left column + top row = z-score · inside = probability (area to the left)</caption><thead><tr><th class='rowh'>z</th>";
   for(var c=0;c<10;c++) h+="<th data-c='"+c+"'>0.0"+c+"</th>";
   h+="</tr></thead><tbody>";
   for(var r=0;r<=34;r++){var zr=r/10; h+="<tr><td class='rowh'>"+zr.toFixed(1)+"</td>";
-    for(var c2=0;c2<10;c2++){var zz=zr+c2/100; h+="<td data-r='"+r+"' data-c='"+c2+"'>"+Phi(zz).toFixed(4).slice(1)+"</td>";}
+    for(var c2=0;c2<10;c2++){var zz=zr+c2/100; h+="<td data-r='"+r+"' data-c='"+c2+"'>"+Phi(zz).toFixed(4)+"</td>";}
     h+="</tr>";}
   h+="</tbody></table>";
   host.innerHTML=h; wireTable(host.querySelector("table"),readEl,function(td){
@@ -962,7 +1016,7 @@ function wireTable(tbl,readEl,describe){
 }
 function tableBlock(host,prefix){
   host.innerHTML="<div class='tbl-tabs' role='tablist'><button class='btn sel' type='button' data-t='z' id='"+prefix+"TabZ'>Z-table</button><button class='btn' type='button' data-t='t' id='"+prefix+"TabT'>t-table</button></div>"+
-    "<div data-pane='z'><p class='how'><b>Standard normal (Z) table:</b> area to the LEFT of z. Row = first two digits (1.9), column = hundredths (0.06). For a two-tailed p-value: p = 2 × (1 − table value).</p><div class='lk-read' id='"+prefix+"ReadZ'>Click a cell to read it.</div><div class='lk-scroll' id='"+prefix+"Z'></div></div>"+
+    "<div data-pane='z'><div class='how'><b>How to read the Z-table:</b> the <b>z-score</b> is on the <b>outside</b> of the table: the left column gives the first decimal and the top row gives the second decimal. The numbers <b>inside</b> the table are <b>probabilities</b>, the area to the LEFT of that z (Φ).<br>Example: z = 1.23 → row <b>1.2</b> + column <b>0.03</b> → inside value <b>0.8907</b>.<br>Reminder: z = (x − μ) / σ. For a two-tailed p-value: p = 2 × (1 − table value).</div><div class='lk-read' id='"+prefix+"ReadZ'>Click a cell to read it.</div><div class='lk-scroll' id='"+prefix+"Z'></div></div>"+
     "<div data-pane='t' hidden><p class='how'><b>t critical values:</b> row = df (n − 1), column = two-tailed α. If your df isn't listed, use the next smaller row (the cautious choice). The ∞ row equals the Z cutoffs.</p><div class='lk-read' id='"+prefix+"ReadT'>Click a cell to read it.</div><div class='lk-scroll' id='"+prefix+"T'></div></div>";
   buildZTable(document.getElementById(prefix+"Z"),prefix+"ZT",document.getElementById(prefix+"ReadZ"));
   buildTTable(document.getElementById(prefix+"T"),prefix+"TT",document.getElementById(prefix+"ReadT"));
@@ -983,7 +1037,7 @@ function pinCell(tblId,r,c){
   var tbl=document.getElementById(tblId); if(!tbl) return;
   var td=tbl.querySelector("td[data-r='"+r+"'][data-c='"+c+"']"); if(!td) return;
   if(!td.classList.contains("pin")) td.click();
-  var sc=td.closest(".lk-scroll"); if(sc){ sc.scrollTop=Math.max(0,td.offsetTop-sc.clientHeight/2); }
+  var sc=td.closest(".lk-scroll"); if(sc){ setTimeout(function(){ var d=td.getBoundingClientRect().top-sc.getBoundingClientRect().top; sc.scrollTop=Math.max(0,sc.scrollTop+d-sc.clientHeight/2); },300); }
 }
 
 /* =========== Tab 5: scenarios =========== */
@@ -1043,7 +1097,7 @@ function renderScenario(i){
     h+="</div>";
   }
   // step 3
-  var hint=isZ?"For α = 0.05 two-tailed, 2.5% goes in each tail. Search the <b>body</b> of the Z-table for <b>0.9750</b>, then read its row + column.":"Go to the t-table, row df = "+(s.row!==s.df?"(the row you chose)":"your df")+", column <b>α = 0.05</b> (two-tailed).";
+  var hint=isZ?"For α = 0.05 two-tailed, 2.5% goes in each tail, so 97.5% is to the left. This time you work <b>backwards</b>: search the <b>inside</b> of the Z-table (the probabilities) for <b>0.9750</b>, then read the z-score off the <b>outside</b> (left column + top row).":"Go to the t-table, row df = "+(s.row!==s.df?"(the row you chose)":"your df")+", column <b>α = 0.05</b> (two-tailed).";
   h+="<div class='step' data-step='3'><div class='step-h'><span class='step-n'>Step 3</span>Look up the critical value "+L+"*</div><p>"+hint+" <button class='linkbtn' type='button' data-open='"+s.table+"'>Open the "+(isZ?"Z":"t")+"-table</button></p><div class='answer-row'><label for='q_crit'>"+L+"* =</label><input type='number' id='q_crit' step='any'><span class='status' id='st_crit'></span></div></div>";
   // step 4
   h+="<div class='step' data-step='4'><div class='step-h'><span class='step-n'>Step 4</span>Test statistic: how many standard errors away?</div><p>test statistic = (Observed − Expected) / Standard error</p><div class='formula'>SE = "+sym+" / √n &nbsp;&nbsp; "+L+" = (x̄ − μ₀) / SE</div>"+
@@ -1053,7 +1107,7 @@ function renderScenario(i){
   h+="<div class='step' data-step='5'><div class='step-h'><span class='step-n'>Step 5</span>Compare and decide</div><p>Is |"+L+"| bigger than "+L+"*?</p><div class='answer-row'><button class='btn' type='button' data-dec='rej'>Yes → Reject H₀</button><button class='btn' type='button' data-dec='fail'>No → Fail to reject H₀</button></div><div class='fb' id='f5' hidden></div></div>";
   // step 6
   if(isZ){
-    h+="<div class='step' data-step='6'><div class='step-h'><span class='step-n'>Step 6</span>Find the p-value with the Z-table</div><p>Round |z| to 2 decimals and look it up (row + column). The table gives the area to the left. <button class='linkbtn' type='button' data-open='z'>Open the Z-table</button></p><div class='formula'>p (two-tailed) = 2 × (1 − table value)</div>"+
+    h+="<div class='step' data-step='6'><div class='step-h'><span class='step-n'>Step 6</span>Find the p-value with the Z-table</div><p>Now you work <b>forwards</b>: start from your z-score on the <b>outside</b> of the table and read the probability on the <b>inside</b>. Round |z| to 2 decimals. Find the <b>row</b> for the first decimal (left column) and the <b>column</b> for the second decimal (top row). Example: z = 1.23 → row 1.2, column 0.03 → 0.8907. <button class='linkbtn' type='button' data-open='z'>Open the Z-table</button></p><div class='formula'>p (two-tailed) = 2 × (1 − table value)</div>"+
        "<div class='answer-row'><label for='q_tv'>Table value =</label><input type='number' id='q_tv' step='any'><span class='status' id='st_tv'></span></div>"+
        "<div class='answer-row'><label for='q_p'>p =</label><input type='number' id='q_p' step='any'><span class='status' id='st_p'></span></div><div class='fb' id='f6' hidden></div></div>";
   } else {
@@ -1072,13 +1126,27 @@ function renderScenario(i){
   var ci = s.bonusCI ? {lo:s.xbar-s.crit*s.se, hi:s.xbar+s.crit*s.se} : null;
   var checks={df:[s.df,0.01],row:[s.row,0.01],crit:[s.crit,0.006],se:[s.se,0.006],stat:[s.stat,0.021],tv:[s.tv,0.00015],p:[s.p,0.0021]};
   if(ci){checks.lo=[ci.lo,0.03];checks.hi=[ci.hi,0.03];}
+  function zCands(){ // z values a student could reasonably look up (their own rounding included)
+    var out=[Math.round(s.abs*100)/100], si=document.getElementById("q_stat"), sv=si?parseFloat(si.value):NaN;
+    if(!isNaN(sv) && Math.abs(sv-s.stat)<=0.021) out.push(Math.round(Math.abs(sv)*100)/100);
+    if(Math.abs(s.abs*100-Math.round(s.abs*100))>0.05) out.push(Math.floor(s.abs*100)/100, Math.ceil(s.abs*100)/100);
+    return out;
+  }
+  function okFn(key,v){
+    if(key==="tv" && isZ){ return zCands().some(function(z){return Math.abs(v-(+Phi(z).toFixed(4)))<=0.00015;}); }
+    if(key==="p" && isZ){ var ti=document.getElementById("q_tv"), tv=ti?parseFloat(ti.value):NaN;
+      if(!isNaN(tv) && okFn("tv",tv)) return Math.abs(v-2*(1-tv))<=0.0021;
+      return zCands().some(function(z){return Math.abs(v-2*(1-(+Phi(z).toFixed(4))))<=0.0021;}); }
+    return Math.abs(v-checks[key][0])<=checks[key][1];
+  }
   function stepDone(n,ok){var e=host.querySelector(".step[data-step='"+n+"']"); if(e) e.classList.toggle("complete",!!ok);}
   function markStatus(key){
     var inp=document.getElementById("q_"+key), stEl=document.getElementById("st_"+key); if(!inp) return null;
     var v=parseFloat(inp.value); st[key]=inp.value;
     if(inp.value===""||isNaN(v)){stEl.textContent="";stEl.className="status";return null;}
-    var ok=Math.abs(v-checks[key][0])<=checks[key][1];
+    var ok=okFn(key,v);
     stEl.textContent=ok?"✓ correct":"not quite"; stEl.className="status "+(ok?"ok":"bad");
+    if(!ok && key==="tv") stEl.textContent="not quite: row = first decimal of z, column = second decimal";
     if(!ok && key==="crit" && Math.abs(v-1.96)<0.006 && !isZ) stEl.textContent="that's the Z cutoff; use the t-table row";
     if(!ok && key==="stat" && Math.abs(Math.abs(v)-s.abs)<0.021) stEl.textContent="check the sign (x̄ − μ₀)";
     if(!ok && key==="p" && Math.abs(v-(1-s.tv))<0.0021) stEl.textContent="two-tailed: multiply by 2";
@@ -1094,7 +1162,7 @@ function renderScenario(i){
     updateTabs();
   }
   Object.keys(checks).forEach(function(k){var inp=document.getElementById("q_"+k); if(!inp) return; if(st[k]!==undefined) inp.value=st[k];
-    inp.addEventListener("change",refreshSteps); inp.addEventListener("input",function(){var v=parseFloat(inp.value); if(!isNaN(v)&&Math.abs(v-checks[k][0])<=checks[k][1]) refreshSteps(); else {var e=document.getElementById("st_"+k); e.textContent=""; e.className="status";}});});
+    inp.addEventListener("change",refreshSteps); inp.addEventListener("input",function(){var v=parseFloat(inp.value); if(!isNaN(v)&&okFn(k,v)) refreshSteps(); else {var e=document.getElementById("st_"+k); e.textContent=""; e.className="status";}});});
 
   // step 1 buttons
   function doTable(v){
